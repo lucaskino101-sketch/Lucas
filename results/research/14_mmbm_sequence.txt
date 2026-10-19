@@ -1,0 +1,64 @@
+NAS tf= 5 edge level eod  opp=0 | th=0.0: n=1061 E=-0.371 t=-5.3 H1=-0.49 H2=-0.27 ex-top5=-0.439 | th=1.1: n= 316 E=-0.061 t=-0.4 H1=-0.23 H2=+0.06 ex-top5=-0.231
+NAS tf= 5 edge level eod  opp=1 | th=0.0: n= 526 E=-0.447 t=-4.4 H1=-0.48 H2=-0.41 ex-top5=-0.571 | th=1.1: n= 148 E=-0.223 t=-1.0 H1=-0.19 H2=-0.24 ex-top5=-0.581
+NAS tf= 5 edge level rr3  opp=0 | th=0.0: n=1021 E=-0.348 t=-6.8 H1=-0.41 H2=-0.29 ex-top5=-0.364 | th=1.1: n= 301 E=-0.135 t=-1.4 H1=-0.30 H2=-0.02 ex-top5=-0.187
+NAS tf= 5 edge level rr3  opp=1 | th=0.0: n= 500 E=-0.461 t=-6.5 H1=-0.48 H2=-0.45 ex-top5=-0.495 | th=1.1: n= 135 E=-0.330 t=-2.4 H1=-0.45 H2=-0.26 ex-top5=-0.453
+NAS tf= 5 edge fvg   eod  opp=0 | th=0.0: n=1163 E=-0.224 t=-3.5 H1=-0.32 H2=-0.14 ex-top5=-0.285 | th=1.1: n= 355 E=-0.103 t=-0.9 H1=-0.26 H2=+0.01 ex-top5=-0.245
+NAS tf= 5 edge fvg   eod  opp=1 | th=0.0: n= 558 E=-0.310 t=-4.0 H1=-0.47 H2=-0.16 ex-top5=-0.392 | th=1.1: n= 160 E=-0.284 t=-1.7 H1=-0.38 H2=-0.21 ex-top5=-0.557
+NAS tf= 5 edge fvg   rr3  opp=0 | th=0.0: n=1222 E=-0.233 t=-5.1 H1=-0.35 H2=-0.13 ex-top5=-0.246 | th=1.1: n= 375 E=-0.164 t=-1.9 H1=-0.29 H2=-0.08 ex-top5=-0.206
+NAS tf= 5 edge fvg   rr3  opp=1 | th=0.0: n= 585 E=-0.249 t=-3.9 H1=-0.38 H2=-0.13 ex-top5=-0.276 | th=1.1: n= 172 E=-0.281 t=-2.4 H1=-0.39 H2=-0.21 ex-top5=-0.376
+NAS tf= 5 ce   level eod  opp=0 | th=0.0: n= 795 E=-0.398 t=-4.9 H1=-0.45 H2=-0.35 ex-top5=-0.477 | th=1.1: n= 241 E=-0.153 t=-0.9 H1=-0.53 H2=+0.11 ex-top5=-0.374
+NAS tf= 5 ce   level eod  opp=1 | th=0.0: n= 384 E=-0.441 t=-3.7 H1=-0.54 H2=-0.35 ex-top5=-0.593 | th=1.1: n= 110 E=-0.058 t=-0.2 H1=-0.48 H2=+0.17 ex-top5=-0.536
+NAS tf= 5 ce   level rr3  opp=0 | th=0.0: n= 726 E=-0.379 t=-6.3 H1=-0.40 H2=-0.36 ex-top5=-0.402 | th=1.1: n= 222 E=-0.245 t=-2.2 H1=-0.46 H2=-0.10 ex-top5=-0.317
+NAS tf= 5 ce   level rr3  opp=1 | th=0.0: n= 353 E=-0.450 t=-5.3 H1=-0.45 H2=-0.45 ex-top5=-0.498 | th=1.1: n=  98 E=-0.299 t=-1.8 H1=-0.66 H2=-0.09 ex-top5=-0.467
+NAS tf= 5 ce   fvg   eod  opp=0 | th=0.0: n= 864 E=-0.342 t=-4.3 H1=-0.48 H2=-0.22 ex-top5=-0.438 | th=1.1: n= 276 E=-0.246 t=-1.8 H1=-0.29 H2=-0.22 ex-top5=-0.438
+NAS tf= 5 ce   fvg   eod  opp=1 | th=0.0: n= 403 E=-0.388 t=-3.9 H1=-0.58 H2=-0.21 ex-top5=-0.513 | th=1.1: n= 124 E=-0.264 t=-1.3 H1=-0.26 H2=-0.27 ex-top5=-0.624
+NAS tf= 5 ce   fvg   rr3  opp=0 | th=0.0: n= 900 E=-0.298 t=-5.4 H1=-0.38 H2=-0.23 ex-top5=-0.316 | th=1.1: n= 284 E=-0.181 t=-1.8 H1=-0.16 H2=-0.19 ex-top5=-0.237
+NAS tf= 5 ce   fvg   rr3  opp=1 | th=0.0: n= 429 E=-0.287 t=-3.7 H1=-0.35 H2=-0.23 ex-top5=-0.325 | th=1.1: n= 128 E=-0.227 t=-1.6 H1=-0.15 H2=-0.28 ex-top5=-0.355
+NAS tf=15 edge level eod  opp=0 | th=0.0: n= 477 E=-0.098 t=-0.9 H1=+0.11 H2=-0.27 ex-top5=-0.237 | th=1.1: n= 134 E=+0.292 t=+1.2 H1=+0.59 H2=+0.10 ex-top5=-0.065
+NAS tf=15 edge level eod  opp=1 | th=0.0: n= 215 E=-0.024 t=-0.1 H1=+0.25 H2=-0.24 ex-top5=-0.283 | th=1.1: n=  55 E=+0.103 t=+0.3 H1=+1.06 H2=-0.33 ex-top5=-0.610
+NAS tf=15 edge level rr3  opp=0 | th=0.0: n= 449 E=-0.256 t=-3.5 H1=-0.24 H2=-0.27 ex-top5=-0.292 | th=1.1: n= 125 E=-0.033 t=-0.2 H1=-0.16 H2=+0.04 ex-top5=-0.155
+NAS tf=15 edge level rr3  opp=1 | th=0.0: n= 200 E=-0.216 t=-1.9 H1=-0.09 H2=-0.31 ex-top5=-0.295 | th=1.1: n=  47 E=-0.067 t=-0.3 H1=+0.25 H2=-0.20 ex-top5=-0.417
+NAS tf=15 edge fvg   eod  opp=0 | th=0.0: n= 683 E=-0.157 t=-2.6 H1=-0.10 H2=-0.20 ex-top5=-0.212 | th=1.1: n= 198 E=-0.066 t=-0.6 H1=+0.01 H2=-0.12 ex-top5=-0.211
+NAS tf=15 edge fvg   eod  opp=1 | th=0.0: n= 346 E=-0.156 t=-2.1 H1=-0.19 H2=-0.12 ex-top5=-0.227 | th=1.1: n= 106 E=-0.132 t=-0.9 H1=-0.18 H2=-0.10 ex-top5=-0.345
+NAS tf=15 edge fvg   rr3  opp=0 | th=0.0: n= 679 E=-0.174 t=-3.4 H1=-0.15 H2=-0.20 ex-top5=-0.197 | th=1.1: n= 192 E=-0.064 t=-0.6 H1=-0.03 H2=-0.09 ex-top5=-0.144
+NAS tf=15 edge fvg   rr3  opp=1 | th=0.0: n= 348 E=-0.139 t=-2.0 H1=-0.15 H2=-0.13 ex-top5=-0.184 | th=1.1: n= 106 E=-0.104 t=-0.8 H1=-0.10 H2=-0.11 ex-top5=-0.255
+NAS tf=15 ce   level eod  opp=0 | th=0.0: n= 277 E=-0.117 t=-0.8 H1=+0.06 H2=-0.26 ex-top5=-0.295 | th=1.1: n=  89 E=+0.431 t=+1.4 H1=+0.63 H2=+0.32 ex-top5=-0.088
+NAS tf=15 ce   level eod  opp=1 | th=0.0: n= 114 E=-0.120 t=-0.5 H1=+0.12 H2=-0.31 ex-top5=-0.510 | th=1.1: n=  33 E=+0.303 t=+0.6 H1=+1.13 H2=-0.01 ex-top5=-0.859
+NAS tf=15 ce   level rr3  opp=0 | th=0.0: n= 243 E=-0.178 t=-1.7 H1=-0.11 H2=-0.23 ex-top5=-0.243 | th=1.1: n=  79 E=+0.096 t=+0.5 H1=+0.14 H2=+0.07 ex-top5=-0.094
+NAS tf=15 ce   level rr3  opp=1 | th=0.0: n= 102 E=-0.181 t=-1.1 H1=-0.15 H2=-0.20 ex-top5=-0.338 | th=1.1: n=  29 E=+0.100 t=+0.3 H1=-0.12 H2=+0.17 ex-top5=-0.465
+NAS tf=15 ce   fvg   eod  opp=0 | th=0.0: n= 493 E=-0.158 t=-1.8 H1=-0.03 H2=-0.28 ex-top5=-0.250 | th=1.1: n= 159 E=+0.023 t=+0.1 H1=+0.14 H2=-0.07 ex-top5=-0.214
+NAS tf=15 ce   fvg   eod  opp=1 | th=0.0: n= 238 E=-0.203 t=-1.9 H1=-0.21 H2=-0.19 ex-top5=-0.331 | th=1.1: n=  78 E=-0.075 t=-0.3 H1=-0.23 H2=+0.04 ex-top5=-0.442
+NAS tf=15 ce   fvg   rr3  opp=0 | th=0.0: n= 476 E=-0.194 t=-2.8 H1=-0.13 H2=-0.26 ex-top5=-0.227 | th=1.1: n= 148 E=-0.064 t=-0.5 H1=-0.06 H2=-0.07 ex-top5=-0.168
+NAS tf=15 ce   fvg   rr3  opp=1 | th=0.0: n= 233 E=-0.214 t=-2.3 H1=-0.18 H2=-0.25 ex-top5=-0.283 | th=1.1: n=  75 E=-0.149 t=-0.9 H1=-0.17 H2=-0.13 ex-top5=-0.368
+SPX tf= 5 edge level eod  opp=0 | th=0.0: n= 912 E=-0.329 t=-4.3 H1=-0.27 H2=-0.38 ex-top5=-0.400 | th=1.1: n= 289 E=-0.210 t=-1.6 H1=-0.23 H2=-0.20 ex-top5=-0.384
+SPX tf= 5 edge level eod  opp=1 | th=0.0: n= 314 E=-0.598 t=-5.0 H1=-0.71 H2=-0.50 ex-top5=-0.771 | th=1.1: n=  97 E=-0.349 t=-1.5 H1=-0.47 H2=-0.27 ex-top5=-0.754
+SPX tf= 5 edge level rr3  opp=0 | th=0.0: n= 879 E=-0.314 t=-5.7 H1=-0.27 H2=-0.36 ex-top5=-0.333 | th=1.1: n= 279 E=-0.120 t=-1.2 H1=-0.20 H2=-0.06 ex-top5=-0.176
+SPX tf= 5 edge level rr3  opp=1 | th=0.0: n= 306 E=-0.553 t=-6.4 H1=-0.61 H2=-0.51 ex-top5=-0.612 | th=1.1: n=  94 E=-0.411 t=-2.5 H1=-0.66 H2=-0.24 ex-top5=-0.598
+SPX tf= 5 edge fvg   eod  opp=0 | th=0.0: n=1065 E=-0.298 t=-4.6 H1=-0.26 H2=-0.33 ex-top5=-0.365 | th=1.1: n= 343 E=-0.390 t=-3.8 H1=-0.40 H2=-0.38 ex-top5=-0.527
+SPX tf= 5 edge fvg   eod  opp=1 | th=0.0: n= 405 E=-0.281 t=-2.8 H1=-0.15 H2=-0.41 ex-top5=-0.398 | th=1.1: n= 125 E=-0.198 t=-1.0 H1=-0.07 H2=-0.30 ex-top5=-0.531
+SPX tf= 5 edge fvg   rr3  opp=0 | th=0.0: n=1100 E=-0.289 t=-6.1 H1=-0.26 H2=-0.31 ex-top5=-0.304 | th=1.1: n= 351 E=-0.320 t=-3.8 H1=-0.29 H2=-0.35 ex-top5=-0.367
+SPX tf= 5 edge fvg   rr3  opp=1 | th=0.0: n= 423 E=-0.305 t=-4.1 H1=-0.27 H2=-0.34 ex-top5=-0.345 | th=1.1: n= 129 E=-0.306 t=-2.3 H1=-0.37 H2=-0.25 ex-top5=-0.438
+SPX tf= 5 ce   level eod  opp=0 | th=0.0: n= 659 E=-0.248 t=-2.6 H1=-0.25 H2=-0.25 ex-top5=-0.358 | th=1.1: n= 219 E=-0.129 t=-0.8 H1=-0.22 H2=-0.06 ex-top5=-0.388
+SPX tf= 5 ce   level eod  opp=1 | th=0.0: n= 214 E=-0.594 t=-3.7 H1=-0.81 H2=-0.36 ex-top5=-0.878 | th=1.1: n=  73 E=-0.398 t=-1.5 H1=-0.57 H2=-0.23 ex-top5=-0.932
+SPX tf= 5 ce   level rr3  opp=0 | th=0.0: n= 616 E=-0.265 t=-4.0 H1=-0.22 H2=-0.31 ex-top5=-0.292 | th=1.1: n= 206 E=-0.083 t=-0.7 H1=-0.18 H2=-0.01 ex-top5=-0.159
+SPX tf= 5 ce   level rr3  opp=1 | th=0.0: n= 200 E=-0.559 t=-5.2 H1=-0.56 H2=-0.55 ex-top5=-0.649 | th=1.1: n=  68 E=-0.362 t=-1.8 H1=-0.47 H2=-0.25 ex-top5=-0.625
+SPX tf= 5 ce   fvg   eod  opp=0 | th=0.0: n= 801 E=-0.329 t=-4.0 H1=-0.32 H2=-0.34 ex-top5=-0.411 | th=1.1: n= 274 E=-0.359 t=-2.7 H1=-0.46 H2=-0.29 ex-top5=-0.538
+SPX tf= 5 ce   fvg   eod  opp=1 | th=0.0: n= 274 E=-0.200 t=-1.4 H1=-0.13 H2=-0.27 ex-top5=-0.391 | th=1.1: n=  86 E=+0.097 t=+0.3 H1=+0.05 H2=+0.14 ex-top5=-0.406
+SPX tf= 5 ce   fvg   rr3  opp=0 | th=0.0: n= 819 E=-0.327 t=-5.7 H1=-0.34 H2=-0.31 ex-top5=-0.348 | th=1.1: n= 270 E=-0.350 t=-3.6 H1=-0.40 H2=-0.32 ex-top5=-0.412
+SPX tf= 5 ce   fvg   rr3  opp=1 | th=0.0: n= 290 E=-0.349 t=-3.7 H1=-0.38 H2=-0.32 ex-top5=-0.407 | th=1.1: n=  88 E=-0.216 t=-1.2 H1=-0.43 H2=-0.02 ex-top5=-0.405
+SPX tf=15 edge level eod  opp=0 | th=0.0: n= 413 E=-0.196 t=-1.8 H1=+0.06 H2=-0.40 ex-top5=-0.328 | th=1.1: n= 137 E=+0.088 t=+0.5 H1=+0.33 H2=-0.08 ex-top5=-0.200
+SPX tf=15 edge level eod  opp=1 | th=0.0: n= 121 E=-0.360 t=-1.7 H1=-0.38 H2=-0.35 ex-top5=-0.715 | th=1.1: n=  40 E=+0.229 t=+0.5 H1=+1.30 H2=-0.28 ex-top5=-0.587
+SPX tf=15 edge level rr3  opp=0 | th=0.0: n= 387 E=-0.122 t=-1.4 H1=+0.07 H2=-0.28 ex-top5=-0.162 | th=1.1: n= 127 E=+0.313 t=+2.0 H1=+0.44 H2=+0.23 ex-top5=+0.205
+SPX tf=15 edge level rr3  opp=1 | th=0.0: n= 115 E=-0.291 t=-1.9 H1=-0.17 H2=-0.39 ex-top5=-0.436 | th=1.1: n=  38 E=+0.292 t=+0.9 H1=+1.22 H2=-0.14 ex-top5=-0.103
+SPX tf=15 edge fvg   eod  opp=0 | th=0.0: n= 623 E=-0.140 t=-2.1 H1=-0.11 H2=-0.17 ex-top5=-0.204 | th=1.1: n= 210 E=+0.010 t=+0.1 H1=-0.03 H2=+0.04 ex-top5=-0.134
+SPX tf=15 edge fvg   eod  opp=1 | th=0.0: n= 240 E=-0.172 t=-1.7 H1=-0.17 H2=-0.17 ex-top5=-0.301 | th=1.1: n=  73 E=-0.034 t=-0.2 H1=-0.07 H2=-0.01 ex-top5=-0.444
+SPX tf=15 edge fvg   rr3  opp=0 | th=0.0: n= 633 E=-0.083 t=-1.4 H1=-0.12 H2=-0.04 ex-top5=-0.107 | th=1.1: n= 211 E=+0.103 t=+1.0 H1=+0.06 H2=+0.14 ex-top5=+0.033
+SPX tf=15 edge fvg   rr3  opp=1 | th=0.0: n= 244 E=-0.159 t=-1.8 H1=-0.26 H2=-0.06 ex-top5=-0.225 | th=1.1: n=  74 E=-0.115 t=-0.7 H1=-0.39 H2=+0.04 ex-top5=-0.333
+SPX tf=15 ce   level eod  opp=0 | th=0.0: n= 236 E=+0.018 t=+0.1 H1=+0.15 H2=-0.09 ex-top5=-0.248 | th=1.1: n=  81 E=+0.317 t=+1.1 H1=+0.38 H2=+0.27 ex-top5=-0.162
+SPX tf=15 ce   level eod  opp=1 | th=0.0: n=  55 E=+0.207 t=+0.5 H1=-0.31 H2=+0.67 ex-top5=-0.708 | th=1.1: n=  18 E=+0.946 t=+1.1 H1=+2.06 H2=+0.39 ex-top5=-1.151
+SPX tf=15 ce   level rr3  opp=0 | th=0.0: n= 213 E=-0.178 t=-1.6 H1=-0.05 H2=-0.28 ex-top5=-0.253 | th=1.1: n=  72 E=+0.226 t=+1.1 H1=+0.54 H2=-0.01 ex-top5=+0.023
+SPX tf=15 ce   level rr3  opp=1 | th=0.0: n=  50 E=-0.438 t=-1.9 H1=-0.32 H2=-0.55 ex-top5=-0.804 | th=1.1: n=  16 E=+0.097 t=+0.2 H1=+1.61 H2=-0.81 ex-top5=-1.142
+SPX tf=15 ce   fvg   eod  opp=0 | th=0.0: n= 459 E=-0.185 t=-2.1 H1=-0.21 H2=-0.16 ex-top5=-0.295 | th=1.1: n= 157 E=-0.074 t=-0.5 H1=-0.18 H2=+0.01 ex-top5=-0.287
+SPX tf=15 ce   fvg   eod  opp=1 | th=0.0: n= 173 E=-0.142 t=-1.0 H1=-0.24 H2=-0.04 ex-top5=-0.337 | th=1.1: n=  60 E=+0.141 t=+0.5 H1=+0.25 H2=+0.07 ex-top5=-0.402
+SPX tf=15 ce   fvg   rr3  opp=0 | th=0.0: n= 463 E=-0.170 t=-2.4 H1=-0.24 H2=-0.10 ex-top5=-0.204 | th=1.1: n= 153 E=-0.047 t=-0.4 H1=-0.11 H2=+0.01 ex-top5=-0.148
+SPX tf=15 ce   fvg   rr3  opp=1 | th=0.0: n= 177 E=-0.237 t=-2.2 H1=-0.37 H2=-0.11 ex-top5=-0.329 | th=1.1: n=  59 E=-0.117 t=-0.6 H1=-0.21 H2=-0.06 ex-top5=-0.395

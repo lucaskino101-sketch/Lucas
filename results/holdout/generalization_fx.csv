@@ -1,0 +1,13 @@
+inst,cost,period,n,win,E,t,PF,DD
+EUR_USD,conservative,IS,36,16.7,-0.468,-2.29,0.43,-15.8
+EUR_USD,conservative,OOS,12,8.3,-0.74,-2.02,0.27,-8.6
+EUR_USD,realistic,IS,36,19.4,-0.437,-2.15,0.45,-14.8
+EUR_USD,realistic,OOS,12,8.3,-0.699,-1.92,0.28,-8.2
+GBP_USD,conservative,IS,48,29.2,-0.137,-0.56,0.8,-16.7
+GBP_USD,conservative,OOS,27,40.7,-0.22,-1.05,0.64,-10.0
+GBP_USD,realistic,IS,48,31.2,-0.097,-0.39,0.85,-15.5
+GBP_USD,realistic,OOS,27,40.7,-0.172,-0.82,0.7,-8.9
+XAU_USD,conservative,IS,45,31.1,-0.069,-0.21,0.91,-9.4
+XAU_USD,conservative,OOS,22,22.7,-0.561,-2.39,0.34,-11.8
+XAU_USD,realistic,IS,45,31.1,-0.007,-0.02,0.99,-7.5
+XAU_USD,realistic,OOS,22,22.7,-0.491,-2.1,0.38,-10.4

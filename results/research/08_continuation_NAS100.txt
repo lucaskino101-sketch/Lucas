@@ -1,0 +1,31 @@
+NAS100 cont tf=15 edge stop=level eod    am                  n=  489 win=26.6% E=-0.127 (gross +0.143) t=-1.15 PF=0.86 Sh=-0.36 DD=-64.5% risk=5.4pt | H1 E=+0.033 H2 E=-0.266
+NAS100 cont tf=15 ce   stop=level rr2    am                  n=  203 win=38.9% E=-0.141 (gross +0.097) t=-1.45 PF=0.81 Sh=-0.45 DD=-29.6% risk=5.8pt | H1 E=-0.108 H2 E=-0.169
+NAS100 cont tf=15 ce   stop=fvg   eod    am                  n=  501 win=29.3% E=-0.148 (gross +0.046) t=-1.73 PF=0.82 Sh=-0.54 DD=-69.3% risk=6.9pt | H1 E=-0.018 H2 E=-0.275
+NAS100 cont tf=15 edge stop=fvg   rr2    am                  n=  669 win=38.0% E=-0.151 (gross -0.011) t=-3.20 PF=0.76 Sh=-1.00 DD=-69.9% risk=9.1pt | H1 E=-0.145 H2 E=-0.156
+NAS100 cont tf=15 edge stop=fvg   eod_be am                  n=  692 win=28.2% E=-0.151 (gross +0.003) t=-2.78 PF=0.75 Sh=-0.87 DD=-73.6% risk=8.7pt | H1 E=-0.161 H2 E=-0.142
+NAS100 cont tf=15 edge stop=fvg   rr2    day                 n= 1059 win=39.1% E=-0.151 (gross -0.002) t=-4.15 PF=0.76 Sh=-1.29 DD=-83.2% risk=8.7pt | H1 E=-0.143 H2 E=-0.160
+NAS100 cont tf=15 edge stop=fvg   eod    am                  n=  692 win=34.1% E=-0.154 (gross +0.000) t=-2.59 PF=0.78 Sh=-0.81 DD=-75.0% risk=8.7pt | H1 E=-0.100 H2 E=-0.204
+NAS100 cont tf=15 edge stop=level eod_be am                  n=  489 win=17.8% E=-0.159 (gross +0.111) t=-1.66 PF=0.78 Sh=-0.52 DD=-66.0% risk=5.4pt | H1 E=-0.048 H2 E=-0.255
+NAS100 cont tf=15 ce   stop=level eod    am                  n=  286 win=26.2% E=-0.160 (gross +0.126) t=-1.17 PF=0.83 Sh=-0.37 DD=-46.6% risk=5.1pt | H1 E=-0.043 H2 E=-0.261
+NAS100 cont tf=15 edge stop=fvg   rr3    am                  n=  688 win=35.3% E=-0.171 (gross -0.024) t=-3.33 PF=0.75 Sh=-1.04 DD=-75.5% risk=8.9pt | H1 E=-0.141 H2 E=-0.199
+NAS100 cont tf=15 ce   stop=fvg   rr3    day                 n=  808 win=33.9% E=-0.179 (gross +0.010) t=-3.51 PF=0.76 Sh=-1.09 DD=-81.4% risk=6.9pt | H1 E=-0.120 H2 E=-0.242
+NAS100 cont tf=15 ce   stop=fvg   eod    day                 n=  818 win=31.5% E=-0.179 (gross +0.022) t=-2.91 PF=0.77 Sh=-0.91 DD=-85.2% risk=6.7pt | H1 E=-0.095 H2 E=-0.267
+NAS100 cont tf=15 edge stop=fvg   rr3    day                 n= 1108 win=36.6% E=-0.182 (gross -0.026) t=-4.68 PF=0.72 Sh=-1.46 DD=-89.6% risk=8.5pt | H1 E=-0.171 H2 E=-0.193
+NAS100 cont tf=15 ce   stop=fvg   eod_be am                  n=  501 win=21.4% E=-0.182 (gross +0.012) t=-2.42 PF=0.74 Sh=-0.75 DD=-70.7% risk=6.9pt | H1 E=-0.130 H2 E=-0.232
+NAS100 cont tf=15 edge stop=fvg   eod    day                 n= 1080 win=35.1% E=-0.182 (gross -0.020) t=-4.05 PF=0.73 Sh=-1.26 DD=-90.5% risk=8.3pt | H1 E=-0.170 H2 E=-0.195
+NAS100 cont tf=15 ce   stop=fvg   rr2    day                 n=  717 win=36.5% E=-0.182 (gross -0.003) t=-3.81 PF=0.74 Sh=-1.18 DD=-76.0% risk=7.2pt | H1 E=-0.129 H2 E=-0.237
+NAS100 cont tf=15 edge stop=fvg   eod_be day                 n= 1080 win=28.9% E=-0.182 (gross -0.021) t=-4.44 PF=0.70 Sh=-1.38 DD=-89.9% risk=8.3pt | H1 E=-0.206 H2 E=-0.159
+NAS100 cont tf=15 ce   stop=level rr2    day                 n=  531 win=36.7% E=-0.196 (gross +0.042) t=-3.43 PF=0.73 Sh=-1.06 DD=-67.1% risk=5.9pt | H1 E=-0.220 H2 E=-0.173
+NAS100 cont tf=15 ce   stop=fvg   rr2    am                  n=  442 win=34.6% E=-0.198 (gross -0.027) t=-3.16 PF=0.73 Sh=-0.98 DD=-63.2% risk=7.5pt | H1 E=-0.168 H2 E=-0.228
+NAS100 cont tf=15 ce   stop=fvg   rr3    am                  n=  485 win=31.3% E=-0.199 (gross -0.018) t=-2.93 PF=0.74 Sh=-0.91 DD=-70.4% risk=7.1pt | H1 E=-0.142 H2 E=-0.258
+NAS100 cont tf=15 ce   stop=level rr3    am                  n=  251 win=31.9% E=-0.203 (gross +0.062) t=-1.98 PF=0.76 Sh=-0.62 DD=-47.9% risk=5.4pt | H1 E=-0.168 H2 E=-0.233
+NAS100 cont tf=15 ce   stop=fvg   eod_be day                 n=  818 win=23.8% E=-0.209 (gross -0.008) t=-3.86 PF=0.69 Sh=-1.20 DD=-87.4% risk=6.7pt | H1 E=-0.182 H2 E=-0.237
+NAS100 cont tf=15 ce   stop=level rr3    day                 n=  648 win=31.3% E=-0.218 (gross +0.039) t=-3.62 PF=0.73 Sh=-1.13 DD=-78.7% risk=5.5pt | H1 E=-0.231 H2 E=-0.206
+NAS100 cont tf=15 ce   stop=level eod_be am                  n=  286 win=15.7% E=-0.229 (gross +0.057) t=-2.03 PF=0.68 Sh=-0.63 DD=-51.8% risk=5.1pt | H1 E=-0.274 H2 E=-0.191
+NAS100 cont tf=15 ce   stop=level eod    day                 n=  762 win=26.5% E=-0.234 (gross +0.049) t=-3.16 PF=0.74 Sh=-0.99 DD=-85.7% risk=5.1pt | H1 E=-0.203 H2 E=-0.265
+NAS100 cont tf= 5 edge stop=fvg   rr3    am                  n= 1246 win=27.8% E=-0.234 (gross -0.014) t=-5.13 PF=0.73 Sh=-1.60 DD=-95.9% risk=5.9pt | H1 E=-0.343 H2 E=-0.131
+NAS100 cont tf= 5 edge stop=fvg   eod    am                  n= 1185 win=23.1% E=-0.237 (gross -0.008) t=-3.75 PF=0.74 Sh=-1.17 DD=-96.1% risk=5.8pt | H1 E=-0.339 H2 E=-0.140
+NAS100 cont tf= 5 edge stop=fvg   rr2    am                  n= 1208 win=33.2% E=-0.238 (gross -0.023) t=-6.04 PF=0.70 Sh=-1.88 DD=-95.2% risk=6.0pt | H1 E=-0.302 H2 E=-0.176
+NAS100 cont tf=15 edge stop=level eod    day                 n= 1032 win=26.1% E=-0.259 (gross +0.013) t=-3.95 PF=0.71 Sh=-1.23 DD=-94.7% risk=5.3pt | H1 E=-0.253 H2 E=-0.265
+NAS100 cont tf= 5 edge stop=fvg   rr2    day                 n= 1424 win=32.7% E=-0.260 (gross -0.040) t=-7.24 PF=0.67 Sh=-2.25 DD=-97.9% risk=5.9pt | H1 E=-0.304 H2 E=-0.218
+NAS100 cont tf=15 edge stop=level eod_be day                 n= 1032 win=18.2% E=-0.262 (gross +0.010) t=-4.63 PF=0.64 Sh=-1.44 DD=-94.4% risk=5.3pt | H1 E=-0.264 H2 E=-0.261

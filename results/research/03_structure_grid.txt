@@ -1,0 +1,43 @@
+tf=15 n=1 fvg       tgt=liq minrisk=0.03                     n=  329 win=38.6% E=-0.108 (gross +0.005) t=-1.63 PF=0.81 Sh=-0.51 DD=-37.8% risk=11.0pt | H1 E=-0.110 H2 E=-0.106
+tf=15 n=1 fvg       tgt=rr  minrisk=0.03                     n=  330 win=39.1% E=-0.117 (gross -0.005) t=-1.89 PF=0.79 Sh=-0.59 DD=-41.2% risk=11.1pt | H1 E=-0.102 H2 E=-0.132
+tf=15 n=1 fvg       tgt=liq minrisk=0.1                      n=  328 win=38.1% E=-0.119 (gross -0.007) t=-1.79 PF=0.79 Sh=-0.56 DD=-38.7% risk=11.1pt | H1 E=-0.116 H2 E=-0.122
+tf=15 n=2 fvg       tgt=liq minrisk=0.03                     n=  264 win=38.3% E=-0.121 (gross -0.010) t=-1.65 PF=0.78 Sh=-0.52 DD=-37.6% risk=11.1pt | H1 E=-0.154 H2 E=-0.089
+tf= 5 n=2 mss_close tgt=rr  minrisk=0.1                      n= 1473 win=37.7% E=-0.125 (gross +0.005) t=-3.84 PF=0.81 Sh=-1.20 DD=-87.1% risk=10.0pt | H1 E=-0.128 H2 E=-0.122
+tf= 5 n=2 mss_close tgt=liq minrisk=0.1                      n= 1473 win=36.1% E=-0.126 (gross +0.004) t=-3.49 PF=0.81 Sh=-1.09 DD=-88.0% risk=10.0pt | H1 E=-0.137 H2 E=-0.116
+tf=15 n=1 fvg       tgt=rr  minrisk=0.1                      n=  329 win=38.6% E=-0.127 (gross -0.017) t=-2.06 PF=0.77 Sh=-0.64 DD=-42.0% risk=11.1pt | H1 E=-0.108 H2 E=-0.147
+tf= 5 n=2 mss_close tgt=rr  minrisk=0.03                     n= 1483 win=38.0% E=-0.129 (gross +0.016) t=-3.95 PF=0.80 Sh=-1.23 DD=-88.0% risk=9.7pt | H1 E=-0.146 H2 E=-0.112
+tf=15 n=1 fvg       tgt=eod minrisk=0.03                     n=  337 win=37.4% E=-0.129 (gross -0.016) t=-1.93 PF=0.77 Sh=-0.60 DD=-41.9% risk=11.0pt | H1 E=-0.144 H2 E=-0.115
+tf= 5 n=2 mss_close tgt=liq minrisk=0.03                     n= 1483 win=36.3% E=-0.131 (gross +0.014) t=-3.60 PF=0.80 Sh=-1.12 DD=-89.1% risk=9.7pt | H1 E=-0.152 H2 E=-0.112
+tf=15 n=1 fvg       tgt=eod minrisk=0.1                      n=  335 win=37.0% E=-0.133 (gross -0.021) t=-1.97 PF=0.77 Sh=-0.61 DD=-42.0% risk=11.0pt | H1 E=-0.143 H2 E=-0.123
+tf=15 n=1 ifvg      tgt=liq minrisk=0.1                      n=  288 win=36.5% E=-0.133 (gross +0.022) t=-1.66 PF=0.80 Sh=-0.52 DD=-38.5% risk=8.5pt | H1 E=-0.024 H2 E=-0.245
+tf=15 n=1 mss_close tgt=rr  minrisk=0.1                      n= 1227 win=38.7% E=-0.134 (gross -0.025) t=-4.13 PF=0.77 Sh=-1.29 DD=-83.8% risk=11.8pt | H1 E=-0.159 H2 E=-0.111
+tf=15 n=2 fvg       tgt=liq minrisk=0.1                      n=  263 win=37.6% E=-0.135 (gross -0.024) t=-1.84 PF=0.76 Sh=-0.57 DD=-38.5% risk=11.1pt | H1 E=-0.161 H2 E=-0.108
+tf=15 n=1 ifvg      tgt=rr  minrisk=0.1                      n=  283 win=35.7% E=-0.139 (gross +0.010) t=-1.79 PF=0.80 Sh=-0.56 DD=-42.9% risk=8.7pt | H1 E=+0.004 H2 E=-0.276
+tf= 5 n=1 mss_close tgt=rr  minrisk=0.03                     n= 1703 win=37.1% E=-0.146 (gross +0.002) t=-4.74 PF=0.78 Sh=-1.48 DD=-93.7% risk=9.3pt | H1 E=-0.183 H2 E=-0.110
+tf=15 n=2 fvg       tgt=rr  minrisk=0.03                     n=  264 win=38.6% E=-0.146 (gross -0.036) t=-2.15 PF=0.74 Sh=-0.67 DD=-41.0% risk=11.2pt | H1 E=-0.166 H2 E=-0.127
+tf=15 n=1 mss_close tgt=liq minrisk=0.1                      n= 1227 win=37.7% E=-0.148 (gross -0.039) t=-4.28 PF=0.75 Sh=-1.33 DD=-86.2% risk=11.8pt | H1 E=-0.183 H2 E=-0.115
+tf=15 n=1 mss_close tgt=eod minrisk=0.1                      n= 1227 win=36.8% E=-0.149 (gross -0.040) t=-4.05 PF=0.75 Sh=-1.27 DD=-87.1% risk=11.8pt | H1 E=-0.185 H2 E=-0.115
+tf=15 n=1 mss_close tgt=rr  minrisk=0.03                     n= 1233 win=38.2% E=-0.152 (gross -0.035) t=-4.68 PF=0.74 Sh=-1.46 DD=-87.1% risk=11.6pt | H1 E=-0.189 H2 E=-0.116
+tf= 5 n=1 mss_close tgt=liq minrisk=0.1                      n= 1688 win=35.0% E=-0.153 (gross -0.018) t=-4.55 PF=0.77 Sh=-1.42 DD=-94.8% risk=9.5pt | H1 E=-0.201 H2 E=-0.107
+tf= 5 n=1 mss_close tgt=rr  minrisk=0.1                      n= 1688 win=36.4% E=-0.154 (gross -0.019) t=-5.02 PF=0.77 Sh=-1.57 DD=-94.4% risk=9.5pt | H1 E=-0.195 H2 E=-0.115
+tf=15 n=2 mss_close tgt=rr  minrisk=0.1                      n=  983 win=37.5% E=-0.155 (gross -0.047) t=-4.38 PF=0.73 Sh=-1.36 DD=-81.5% risk=12.1pt | H1 E=-0.174 H2 E=-0.137
+tf=15 n=1 ifvg      tgt=liq minrisk=0.03                     n=  311 win=35.0% E=-0.157 (gross +0.016) t=-1.95 PF=0.78 Sh=-0.61 DD=-43.9% risk=8.0pt | H1 E=-0.099 H2 E=-0.218
+tf=15 n=2 ifvg      tgt=liq minrisk=0.03                     n=  211 win=34.6% E=-0.158 (gross +0.013) t=-1.58 PF=0.78 Sh=-0.49 DD=-33.3% risk=7.7pt | H1 E=-0.193 H2 E=-0.126
+tf= 5 n=1 mss_close tgt=liq minrisk=0.03                     n= 1703 win=35.1% E=-0.159 (gross -0.011) t=-4.71 PF=0.77 Sh=-1.47 DD=-95.4% risk=9.3pt | H1 E=-0.204 H2 E=-0.115
+tf=15 n=2 fvg       tgt=rr  minrisk=0.1                      n=  263 win=38.0% E=-0.159 (gross -0.050) t=-2.34 PF=0.72 Sh=-0.73 DD=-41.9% risk=11.2pt | H1 E=-0.173 H2 E=-0.146
+tf=15 n=2 fvg       tgt=eod minrisk=0.03                     n=  269 win=36.8% E=-0.162 (gross -0.050) t=-2.22 PF=0.72 Sh=-0.69 DD=-42.8% risk=11.1pt | H1 E=-0.190 H2 E=-0.136
+tf= 5 n=2 mss_close tgt=eod minrisk=0.1                      n= 1473 win=33.6% E=-0.163 (gross -0.033) t=-4.25 PF=0.76 Sh=-1.33 DD=-92.9% risk=10.0pt | H1 E=-0.176 H2 E=-0.150
+tf=15 n=2 mss_close tgt=rr  minrisk=0.03                     n=  989 win=37.3% E=-0.164 (gross -0.049) t=-4.62 PF=0.72 Sh=-1.44 DD=-83.2% risk=11.9pt | H1 E=-0.206 H2 E=-0.122
+tf=15 n=1 mss_close tgt=liq minrisk=0.03                     n= 1233 win=37.1% E=-0.164 (gross -0.047) t=-4.69 PF=0.73 Sh=-1.46 DD=-88.7% risk=11.6pt | H1 E=-0.205 H2 E=-0.125
+tf=15 n=2 fvg       tgt=eod minrisk=0.1                      n=  267 win=36.3% E=-0.167 (gross -0.056) t=-2.27 PF=0.72 Sh=-0.71 DD=-42.9% risk=11.1pt | H1 E=-0.188 H2 E=-0.145
+tf=15 n=1 mss_close tgt=eod minrisk=0.03                     n= 1233 win=36.2% E=-0.170 (gross -0.053) t=-4.60 PF=0.72 Sh=-1.43 DD=-90.0% risk=11.6pt | H1 E=-0.215 H2 E=-0.125
+tf=15 n=2 mss_close tgt=liq minrisk=0.1                      n=  983 win=36.3% E=-0.173 (gross -0.065) t=-4.55 PF=0.70 Sh=-1.42 DD=-84.0% risk=12.1pt | H1 E=-0.186 H2 E=-0.160
+tf=15 n=2 ifvg      tgt=liq minrisk=0.1                      n=  201 win=34.3% E=-0.173 (gross -0.012) t=-1.76 PF=0.76 Sh=-0.55 DD=-35.0% risk=8.0pt | H1 E=-0.142 H2 E=-0.202
+tf= 5 n=2 mss_close tgt=eod minrisk=0.03                     n= 1483 win=33.1% E=-0.178 (gross -0.033) t=-4.45 PF=0.75 Sh=-1.39 DD=-94.8% risk=9.7pt | H1 E=-0.194 H2 E=-0.162
+tf= 3 n=2 mss_close tgt=liq minrisk=0.1                      n= 1778 win=33.6% E=-0.181 (gross -0.042) t=-5.43 PF=0.74 Sh=-1.70 DD=-97.1% risk=9.2pt | H1 E=-0.228 H2 E=-0.135
+tf=15 n=2 mss_close tgt=liq minrisk=0.03                     n=  989 win=35.9% E=-0.184 (gross -0.069) t=-4.82 PF=0.69 Sh=-1.50 DD=-85.9% risk=11.9pt | H1 E=-0.215 H2 E=-0.154
+tf= 3 n=2 mss_close tgt=rr  minrisk=0.1                      n= 1778 win=35.2% E=-0.184 (gross -0.045) t=-6.12 PF=0.73 Sh=-1.91 DD=-96.9% risk=9.2pt | H1 E=-0.239 H2 E=-0.132
+tf=15 n=2 mss_close tgt=eod minrisk=0.1                      n=  983 win=35.2% E=-0.184 (gross -0.076) t=-4.63 PF=0.69 Sh=-1.44 DD=-85.8% risk=12.1pt | H1 E=-0.200 H2 E=-0.169
+tf=15 n=1 ifvg      tgt=rr  minrisk=0.03                     n=  300 win=34.3% E=-0.185 (gross -0.023) t=-2.44 PF=0.74 Sh=-0.76 DD=-47.4% risk=8.4pt | H1 E=-0.098 H2 E=-0.270
+tf= 5 n=1 mss_close tgt=eod minrisk=0.1                      n= 1688 win=32.3% E=-0.188 (gross -0.054) t=-5.31 PF=0.73 Sh=-1.66 DD=-97.0% risk=9.5pt | H1 E=-0.250 H2 E=-0.128
+tf= 3 n=2 mss_close tgt=liq minrisk=0.03                     n= 1792 win=33.8% E=-0.191 (gross -0.035) t=-5.70 PF=0.73 Sh=-1.78 DD=-97.7% risk=8.9pt | H1 E=-0.264 H2 E=-0.120

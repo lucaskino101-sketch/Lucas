@@ -1,0 +1,20 @@
+### NAS100_USD M1 noise-area momentum, 1x notional, net of 1.0pt/trade
+  IS all: days=2358 trades=2524 ann.ret=-9.4% vol=8.8% Sharpe=-1.07
+  2005-09: days=1154 trades=1286 ann.ret=-13.9% vol=10.4% Sharpe=-1.34
+  2010-14: days=1204 trades=1238 ann.ret=-4.9% vol=6.9% Sharpe=-0.72
+year
+2005    -20.0%/yr
+2006    -24.7%/yr
+2007     -1.5%/yr
+2008    +12.1%/yr
+2009    -36.7%/yr
+2010    -16.9%/yr
+2011     -6.5%/yr
+2012     +3.0%/yr
+2013     -4.8%/yr
+2014     +0.8%/yr
+
+### NAS100_USD M3 30-min ORB, stop=other side of range, exit 15:55
+  IS all: n=2265 win=41.5% E=-0.085R t=-3.67
+  2005-09: n=1107 win=40.1% E=-0.089R t=-2.54
+  2010-14: n=1158 win=42.8% E=-0.082R t=-2.67

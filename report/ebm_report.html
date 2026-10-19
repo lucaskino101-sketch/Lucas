@@ -1,0 +1,564 @@
+<title>Expansion Breakaway Model</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one-column research note (860px measure). Verdict tiles, the setup, when it trades, results, what failed, caveats, forward test. */
+:root {
+  --bg: #f1f2f4;
+  --panel: #fcfcfb;
+  --fg: #0f1216;
+  --fg2: #4a505a;
+  --muted: #747a84;
+  --rule: #e0e2e7;
+  --axis: #c3c6cc;
+  --mark-neutral: #b4b9c2;
+  --accent: #2a78d6;
+  --accent-wash: rgba(42, 120, 214, 0.11);
+  --band: rgba(42, 120, 214, 0.06);
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --s4: #eda100;
+  --good: #0ca30c;
+  --critical: #d03b3b;
+  --code-bg: #e8eaee;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e0f11; --panel: #1a1a19; --fg: #eef0f2; --fg2: #c3c7ce; --muted: #8d929b; --rule: #2c2d30;
+    --axis: #404247; --mark-neutral: #5a5f68; --accent: #3987e5; --accent-wash: rgba(57, 135, 229, 0.18);
+    --band: rgba(57, 135, 229, 0.09); --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    --code-bg: #24262a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e0f11; --panel: #1a1a19; --fg: #eef0f2; --fg2: #c3c7ce; --muted: #8d929b; --rule: #2c2d30;
+  --axis: #404247; --mark-neutral: #5a5f68; --accent: #3987e5; --accent-wash: rgba(57, 135, 229, 0.18);
+  --band: rgba(57, 135, 229, 0.09); --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+  --code-bg: #24262a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
+.page {
+  max-width: 860px; margin: 0 auto; padding-block: 40px 72px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 56px;
+}
+header { display: grid; gap: 14px; }
+.eyebrow { font-family: var(--font-data); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-size: clamp(32px, 6vw, 46px); line-height: 1.08; font-weight: 700; letter-spacing: -0.015em; margin: 0; text-wrap: balance; }
+h2 { font-size: 24px; line-height: 1.25; font-weight: 600; margin: 0; text-wrap: balance; }
+h3 { font-size: 16px; line-height: 1.35; font-weight: 600; margin: 0; }
+p { margin: 0; max-width: 66ch; }
+.dek { font-size: 18px; color: var(--fg2); }
+section { display: grid; gap: 20px; min-width: 0; }
+.lead { color: var(--fg2); }
+.mono, code { font-family: var(--font-data); font-size: 0.9em; }
+code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+a { color: var(--accent); }
+a:focus-visible, [tabindex]:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+/* verdict + tiles */
+.verdict { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 18px 20px; display: grid; gap: 6px; }
+.verdict h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; }
+.tile { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; display: grid; gap: 4px; align-content: start; min-width: 0; }
+.tile .label { font-size: 13px; color: var(--fg2); }
+.tile .value { font-size: 34px; line-height: 1.15; font-weight: 600; letter-spacing: -0.01em; }
+.tile .sub { font-size: 13px; color: var(--muted); }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--fg); margin-top: 6px; }
+.chip svg { width: 14px; height: 14px; flex: none; }
+.chip .good { color: var(--good); }
+.chip .bad { color: var(--critical); }
+
+/* rules */
+ol.rules { margin: 0; padding: 0; list-style: none; counter-reset: r; display: grid; gap: 0; border-top: 1px solid var(--rule); }
+ol.rules li { counter-increment: r; display: grid; grid-template-columns: 34px 132px 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+ol.rules li::before { content: counter(r); font-family: var(--font-data); font-size: 13px; color: var(--muted); }
+ol.rules .k { font-weight: 600; }
+ol.rules .v { color: var(--fg2); min-width: 0; }
+@media (max-width: 560px) { ol.rules li { grid-template-columns: 28px 1fr; } ol.rules .v { grid-column: 2; } }
+
+/* figures */
+figure { margin: 0; display: grid; gap: 10px; min-width: 0; }
+figcaption { font-size: 14px; color: var(--muted); max-width: 70ch; }
+.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 18px; min-width: 0; }
+.scroll { overflow-x: auto; }
+.scroll svg { display: block; width: 100%; min-width: 640px; height: auto; }
+.scroll svg.tl-narrow { display: none; min-width: 0; }
+@media (max-width: 600px) { .scroll svg.tl-wide { display: none; } .scroll svg.tl-narrow { display: block; } }
+.d-fvg { fill: var(--accent-wash); }
+.d-level { stroke: var(--fg2); stroke-width: 1.5; }
+.d-ce { stroke: var(--accent); stroke-width: 2; }
+.d-wick { stroke: var(--fg); stroke-width: 1.2; }
+.d-up { fill: var(--panel); stroke: var(--fg); stroke-width: 1.2; }
+.d-down { fill: var(--fg); stroke: var(--fg); stroke-width: 1.2; }
+.d-dot { fill: var(--accent); stroke: var(--panel); stroke-width: 2; }
+.d-leader { stroke: var(--muted); stroke-width: 1; }
+.d-label { fill: var(--fg2); font-size: 12px; font-family: var(--font-body); }
+.d-strong { fill: var(--fg); font-weight: 600; }
+.d-muted { fill: var(--muted); }
+.d-bracket { fill: none; stroke: var(--muted); stroke-width: 1; }
+.d-axis { stroke: var(--axis); stroke-width: 1; }
+.d-tick { fill: var(--muted); font-size: 11px; font-family: var(--font-data); }
+.d-map { fill: var(--mark-neutral); }
+.d-act { fill: var(--accent); }
+.d-wash { fill: var(--accent-wash); stroke: var(--accent); stroke-width: 1; }
+.d-snap { stroke: var(--fg); stroke-width: 1; }
+
+/* charts */
+.chart-head { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; justify-content: space-between; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--fg2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; }
+.legend i.sq { width: 10px; height: 10px; border-radius: 2px; }
+.plotwrap { position: relative; }
+.plot { width: 100%; min-height: 240px; touch-action: pan-y; }
+.plot svg { display: block; }
+.plot .grid { stroke: var(--rule); stroke-width: 1; }
+.plot .zero { stroke: var(--axis); stroke-width: 1; }
+.plot .band { fill: var(--band); }
+.plot .tick { fill: var(--muted); font-size: 11px; font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+.plot .bandlabel { fill: var(--muted); font-size: 11px; font-family: var(--font-body); }
+.plot .endlabel { fill: var(--fg2); font-size: 12px; font-family: var(--font-body); }
+.plot .barlabel { fill: var(--fg2); font-size: 11px; font-family: var(--font-data); }
+.plot .sublabel { fill: var(--muted); font-size: 10px; font-family: var(--font-body); }
+.plot .line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.plot .enddot, .plot .hoverdot { stroke: var(--panel); stroke-width: 2; }
+.plot .cross { stroke: var(--fg2); stroke-width: 1; }
+.plot .hit { fill: transparent; }
+.plot .bar:focus { outline: none; }
+.plot .bar:focus-visible { stroke: var(--fg); stroke-width: 2; }
+.tip { position: absolute; pointer-events: none; background: var(--panel); color: var(--fg); border: 1px solid var(--rule);
+  border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12); min-width: 170px; z-index: 2; }
+.tipdate { color: var(--muted); margin-bottom: 4px; font-family: var(--font-data); }
+.tiprow { display: grid; grid-template-columns: 10px 1fr auto; gap: 8px; align-items: center; }
+.tiprow .key { width: 10px; height: 3px; border-radius: 2px; }
+.tiprow b { font-family: var(--font-data); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+/* tables */
+details { font-size: 14px; }
+summary { cursor: pointer; color: var(--fg2); width: fit-content; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-weight: 600; color: var(--fg2); font-size: 13px; }
+td.num, th.num { text-align: right; font-family: var(--font-data); font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.hl td { font-weight: 600; }
+.neg { color: var(--fg); }
+ul.plain { margin: 0; padding-left: 20px; display: grid; gap: 10px; max-width: 70ch; }
+ul.plain li::marker { color: var(--muted); }
+ol.steps { margin: 0; padding-left: 22px; display: grid; gap: 10px; max-width: 70ch; }
+footer { border-top: 1px solid var(--rule); padding-top: 18px; font-size: 13px; color: var(--muted); display: grid; gap: 8px; }
+footer p { max-width: 80ch; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="page">
+  <header>
+    <div class="eyebrow">ICT research · Nasdaq-100 futures · 1&#8209;minute data 2005–2020</div>
+    <h1>Expansion Breakaway Model</h1>
+    <p class="dek">An Inner Circle Trader setup with one rule added: trade the breakaway fair value gap only when daily volatility is expanding. Built on 2005–2014 data, frozen, then run once on 2015–2020.</p>
+  </header>
+
+  <section aria-labelledby="h-stand">
+    <div class="verdict">
+      <h3 id="h-stand">Where it stands</h3>
+      <p>The model made money on the Nasdaq-100 holdout and lost it on the S&amp;P 500, EUR/USD, GBP/USD and gold. The Nasdaq profit rests on about three trend days and the t-stat is about 1. Treat it as a lead to forward-test, not a proven edge. The mechanized textbook ICT setups lost money everywhere.</p>
+    </div>
+    <div class="tiles">
+      <div class="tile">
+        <div class="label">Nasdaq-100 holdout</div>
+        <div class="value">+0.31R</div>
+        <div class="sub">per trade over 58 trades, after 1-point costs</div>
+        <span class="chip"><svg class="good" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Held up out of sample</span>
+      </div>
+      <div class="tile">
+        <div class="label">Profit factor, Nasdaq-100 holdout</div>
+        <div class="value">1.45</div>
+        <div class="sub">max drawdown −7.3% at 1% risk per trade</div>
+      </div>
+      <div class="tile">
+        <div class="label">S&amp;P 500 holdout, same rules</div>
+        <div class="value">−0.35R</div>
+        <div class="sub">per trade over 47 trades</div>
+        <span class="chip"><svg class="bad" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Failed out of sample</span>
+      </div>
+      <div class="tile">
+        <div class="label">Textbook ICT 2022 model</div>
+        <div class="value">−0.27R</div>
+        <div class="sub">per trade over 1,084 Nasdaq-100 holdout trades</div>
+        <span class="chip"><svg class="bad" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Lost in every period</span>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-setup">
+    <h2 id="h-setup">The setup</h2>
+    <figure>
+      <div class="panel scroll"><svg viewBox="0 0 760 304" role="img" aria-label="Illustrated long setup: price runs a buy-side level, a 15-minute candle closes above it leaving a bullish fair value gap, a limit buy fills at the gap midpoint with the stop at the level, and the position is held to 15:55."><rect class="d-fvg" x="172" y="166.0" width="428" height="18.0"/><line class="d-level" x1="70" y1="190.0" x2="600" y2="190.0"/><line class="d-ce" x1="172" y1="175.0" x2="600" y2="175.0"/><line class="d-wick" x1="100" y1="206.0" x2="100" y2="230.0"/><rect class="d-up" x="92" y="210.0" width="16" height="8.0"/><line class="d-wick" x1="140" y1="196.0" x2="140" y2="214.0"/><rect class="d-up" x="132" y="200.0" width="16" height="10.0"/><line class="d-wick" x1="180" y1="184.0" x2="180" y2="204.0"/><rect class="d-up" x="172" y="194.0" width="16" height="6.0"/><line class="d-wick" x1="220" y1="146.0" x2="220" y2="196.0"/><rect class="d-up" x="212" y="150.0" width="16" height="44.0"/><line class="d-wick" x1="260" y1="130.0" x2="260" y2="166.0"/><rect class="d-up" x="252" y="134.0" width="16" height="16.0"/><line class="d-wick" x1="300" y1="126.0" x2="300" y2="150.0"/><rect class="d-down" x="292" y="134.0" width="16" height="12.0"/><line class="d-wick" x1="340" y1="142.0" x2="340" y2="176.0"/><rect class="d-down" x="332" y="146.0" width="16" height="16.0"/><line class="d-wick" x1="380" y1="138.0" x2="380" y2="164.0"/><rect class="d-up" x="372" y="142.0" width="16" height="20.0"/><line class="d-wick" x1="420" y1="118.0" x2="420" y2="146.0"/><rect class="d-up" x="412" y="122.0" width="16" height="20.0"/><line class="d-wick" x1="460" y1="110.0" x2="460" y2="128.0"/><rect class="d-up" x="452" y="114.0" width="16" height="8.0"/><line class="d-wick" x1="500" y1="106.0" x2="500" y2="122.0"/><rect class="d-up" x="492" y="108.0" width="16" height="6.0"/><line class="d-wick" x1="540" y1="98.0" x2="540" y2="112.0"/><rect class="d-up" x="532" y="102.0" width="16" height="6.0"/><line class="d-wick" x1="630" y1="60.0" x2="630" y2="76.0"/><rect class="d-up" x="622" y="64.0" width="16" height="6.0"/><line class="d-wick" x1="670" y1="54.0" x2="670" y2="68.0"/><rect class="d-up" x="662" y="58.0" width="16" height="6.0"/><line class="d-leader" x1="340" y1="181.0" x2="340" y2="200.0"/><circle class="d-dot" cx="340" cy="175.0" r="5"/><text class="d-label" x="340" y="214.0" text-anchor="middle">filled at CE</text><circle class="d-dot" cx="700" cy="58.0" r="5"/><text class="d-label" x="700" y="44.0" text-anchor="middle">exit 15:55</text><text class="d-label d-strong" x="610" y="162.0">breakaway FVG</text><text class="d-label" x="610" y="179.0">limit buy at CE</text><text class="d-label" x="610" y="194.0">stop at run level</text><text class="d-label d-muted" x="74" y="184.0">buy-side level</text><path class="d-bracket" d="M80 27 V22 H400 V27"/><text class="d-label d-muted" x="240.0" y="17" text-anchor="middle">run window 09:30–11:30</text><path class="d-bracket" d="M280 57 V52 H480 V57"/><text class="d-label d-muted" x="380.0" y="47" text-anchor="middle">limit live until 12:00</text><line class="d-axis" x1="70" y1="272" x2="565" y2="272"/><line class="d-axis" x1="600" y1="272" x2="720" y2="272"/><text class="d-label d-muted" x="583" y="276" text-anchor="middle">⋯</text><line class="d-axis" x1="80" y1="272" x2="80" y2="277"/><text class="d-tick" x="80" y="292" text-anchor="middle">09:30</text><line class="d-axis" x1="160" y1="272" x2="160" y2="277"/><text class="d-tick" x="160" y="292" text-anchor="middle">10:00</text><line class="d-axis" x1="240" y1="272" x2="240" y2="277"/><text class="d-tick" x="240" y="292" text-anchor="middle">10:30</text><line class="d-axis" x1="320" y1="272" x2="320" y2="277"/><text class="d-tick" x="320" y="292" text-anchor="middle">11:00</text><line class="d-axis" x1="400" y1="272" x2="400" y2="277"/><text class="d-tick" x="400" y="292" text-anchor="middle">11:30</text><line class="d-axis" x1="480" y1="272" x2="480" y2="277"/><text class="d-tick" x="480" y="292" text-anchor="middle">12:00</text><line class="d-axis" x1="610" y1="272" x2="610" y2="277"/><text class="d-tick" x="610" y="292" text-anchor="middle">15:30</text><line class="d-axis" x1="690" y1="272" x2="690" y2="277"/><text class="d-tick" x="690" y="292" text-anchor="middle">16:00</text></svg></div>
+      <figcaption>An illustrated long on 15-minute candles. Price runs a buy-side level, a candle closes above it, and the leg leaves a bullish fair value gap. The limit sits at the gap's midpoint with the stop at the level. Days like this one pay for the rest: 64% of holdout trades hit the stop.</figcaption>
+    </figure>
+    <ol class="rules">
+      <li><span class="k">Regime gate</span><span class="v">The 14-day average daily range is at least 1.10 × the 100-day average. Otherwise no trade today.</span></li>
+      <li><span class="k">Liquidity map</span><span class="v">At <span class="mono">09:30</span>: the overnight, previous-day, pre-market, Asia, London and previous cash-session highs above the open, within 1.5 ATR of it.</span></li>
+      <li><span class="k">Run</span><span class="v">Between <span class="mono">09:30</span> and <span class="mono">11:30</span>, price trades through one or more of those levels.</span></li>
+      <li><span class="k">Breakaway</span><span class="v">A 15-minute candle closes above the highest level that was run, and the breakout leg contains a bullish 15-minute FVG.</span></li>
+      <li><span class="k">Entry</span><span class="v">Limit buy at the FVG's midpoint (consequent encroachment), live until <span class="mono">12:00</span>. Cancel it if a 15-minute candle closes back below the level.</span></li>
+      <li><span class="k">Stop</span><span class="v">At the run level. Skip the trade if that's closer than max(0.05 ATR, 2 NQ points) or wider than 0.6 ATR.</span></li>
+      <li><span class="k">Exit</span><span class="v">At <span class="mono">15:55</span> New York, or at the stop. One trade per day. Shorts are the mirror image.</span></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="h-when">
+    <h2 id="h-when">When it trades</h2>
+    <p class="lead">The gate was open on 29% of days in 2005–2014 and 37% in 2015–2020, and a setup forms on only some of those, so the model averages about 11 trades a year. Everything else in the day exists to build the liquidity map it reads at the open.</p>
+    <figure>
+      <div class="panel scroll"><svg class="tl-wide" viewBox="0 0 760 246" role="img" aria-label="One Globex day in New York time: the overnight, Asia, London and pre-market ranges set the liquidity levels; at 09:30 the map is fixed; runs count from 09:30 to 11:30; the limit order lives until 12:00; positions are held to 15:55."><text class="d-label" x="168" y="48" text-anchor="end">Overnight range</text><rect class="d-map" x="180.0" y="38" width="394.5" height="12" rx="3"/><text class="d-label" x="168" y="74" text-anchor="end">Asia range</text><rect class="d-map" x="230.9" y="64" width="101.8" height="12" rx="3"/><text class="d-label" x="168" y="100" text-anchor="end">London range</text><rect class="d-map" x="383.6" y="90" width="76.4" height="12" rx="3"/><text class="d-label" x="168" y="126" text-anchor="end">Pre-market range</text><rect class="d-map" x="510.9" y="116" width="63.6" height="12" rx="3"/><text class="d-label" x="168" y="152" text-anchor="end">Run window</text><rect class="d-act" x="574.5" y="142" width="50.9" height="12" rx="3"/><text class="d-label" x="168" y="178" text-anchor="end">Limit order live</text><rect class="d-wash" x="574.5" y="168" width="63.6" height="12" rx="3"/><text class="d-label" x="168" y="204" text-anchor="end">Hold to exit</text><line class="d-ce" x1="574.5" y1="200" x2="737.9" y2="200"/><circle class="d-dot" cx="737.9" cy="200" r="4"/><line class="d-snap" x1="574.5" y1="28" x2="574.5" y2="214"/><text class="d-label d-strong" x="574.5" y="20" text-anchor="middle">09:30 liquidity map</text><line class="d-axis" x1="180.0" y1="218" x2="740.0" y2="218"/><line class="d-axis" x1="180.0" y1="218" x2="180.0" y2="223"/><text class="d-tick" x="180.0" y="238" text-anchor="middle">18:00</text><line class="d-axis" x1="256.4" y1="218" x2="256.4" y2="223"/><text class="d-tick" x="256.4" y="238" text-anchor="middle">21:00</text><line class="d-axis" x1="332.7" y1="218" x2="332.7" y2="223"/><text class="d-tick" x="332.7" y="238" text-anchor="middle">00:00</text><line class="d-axis" x1="409.1" y1="218" x2="409.1" y2="223"/><text class="d-tick" x="409.1" y="238" text-anchor="middle">03:00</text><line class="d-axis" x1="485.5" y1="218" x2="485.5" y2="223"/><text class="d-tick" x="485.5" y="238" text-anchor="middle">06:00</text><line class="d-axis" x1="561.8" y1="218" x2="561.8" y2="223"/><text class="d-tick" x="561.8" y="238" text-anchor="middle">09:00</text><line class="d-axis" x1="638.2" y1="218" x2="638.2" y2="223"/><text class="d-tick" x="638.2" y="238" text-anchor="middle">12:00</text><line class="d-axis" x1="714.5" y1="218" x2="714.5" y2="223"/><text class="d-tick" x="714.5" y="238" text-anchor="middle">15:00</text></svg><svg class="tl-narrow" viewBox="0 0 360 304" role="img" aria-label="One Globex day in New York time: the overnight, Asia, London and pre-market ranges set the liquidity levels; at 09:30 the map is fixed; runs count from 09:30 to 11:30; the limit order lives until 12:00; positions are held to 15:55."><text class="d-label" x="14.0" y="50">Overnight range</text><rect class="d-map" x="14.0" y="54" width="233.9" height="10" rx="3"/><text class="d-label" x="44.2" y="84">Asia range</text><rect class="d-map" x="44.2" y="88" width="60.4" height="10" rx="3"/><text class="d-label" x="134.7" y="118">London range</text><rect class="d-map" x="134.7" y="122" width="45.3" height="10" rx="3"/><text class="d-label" x="210.2" y="152">Pre-market range</text><rect class="d-map" x="210.2" y="156" width="37.7" height="10" rx="3"/><text class="d-label" x="253.9" y="186">Run window</text><rect class="d-act" x="247.9" y="190" width="30.2" height="10" rx="3"/><text class="d-label" x="253.9" y="220">Limit order live</text><rect class="d-wash" x="247.9" y="224" width="37.7" height="10" rx="3"/><text class="d-label" x="253.9" y="254">Hold to exit</text><line class="d-ce" x1="247.9" y1="263" x2="344.7" y2="263"/><circle class="d-dot" cx="344.7" cy="263" r="4"/><line class="d-snap" x1="247.9" y1="30" x2="247.9" y2="272"/><text class="d-label d-strong" x="247.9" y="22" text-anchor="middle">09:30 liquidity map</text><line class="d-axis" x1="14.0" y1="276" x2="346.0" y2="276"/><line class="d-axis" x1="14.0" y1="276" x2="14.0" y2="281"/><text class="d-tick" x="14.0" y="296" text-anchor="start">18:00</text><line class="d-axis" x1="104.5" y1="276" x2="104.5" y2="281"/><text class="d-tick" x="104.5" y="296" text-anchor="middle">00:00</text><line class="d-axis" x1="195.1" y1="276" x2="195.1" y2="281"/><text class="d-tick" x="195.1" y="296" text-anchor="middle">06:00</text><line class="d-axis" x1="285.6" y1="276" x2="285.6" y2="281"/><text class="d-tick" x="285.6" y="296" text-anchor="middle">12:00</text></svg></div>
+      <figcaption>One Globex day in New York time. Grey rows set the liquidity levels; blue rows are when the model acts. Previous-day levels come from the session before.</figcaption>
+    </figure>
+  </section>
+
+  <section aria-labelledby="h-results">
+    <h2 id="h-results">Results</h2>
+    <figure class="panel" id="c-ebm">
+      <div class="chart-head">
+        <h3>Cumulative R, conservative costs</h3>
+        <div class="legend"><span><i style="background: var(--s1)"></i>Nasdaq-100</span><span><i style="background: var(--s2)"></i>S&amp;P 500</span></div>
+      </div>
+      <div class="plotwrap"><div class="plot" tabindex="0" aria-label="Cumulative R chart. Use the arrow keys to move through time."></div><div class="tip" hidden></div></div>
+      <figcaption>The shaded span is the 2015–2020 holdout, run once after the rules were frozen. Costs are 1.0 point (NQ) and 0.5 point (ES) per round trip. Without its three best holdout trades the Nasdaq line would end the holdout lower than it started.</figcaption>
+      <details><summary>Table view</summary><div class="tablewrap"><table id="t-ebm"></table></div></details>
+    </figure>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Market</th><th>Period</th><th class="num">Trades</th><th class="num">Win %</th><th class="num">Expectancy</th><th class="num">t</th><th class="num">Profit factor</th><th class="num">Max DD at 1%</th></tr></thead>
+        <tbody>
+          <tr><td>Nasdaq-100</td><td>2005–2014</td><td class="num">78</td><td class="num">33</td><td class="num">+0.58R</td><td class="num">1.6</td><td class="num">1.75</td><td class="num">−12.2%</td></tr>
+          <tr class="hl"><td>Nasdaq-100</td><td>Holdout 2015–2020</td><td class="num">58</td><td class="num">36</td><td class="num">+0.31R</td><td class="num">1.0</td><td class="num">1.45</td><td class="num">−7.3%</td></tr>
+          <tr><td>S&amp;P 500</td><td>2005–2014</td><td class="num">74</td><td class="num">39</td><td class="num">+0.42R</td><td class="num">1.4</td><td class="num">1.58</td><td class="num">−15.6%</td></tr>
+          <tr class="hl"><td>S&amp;P 500</td><td>Holdout 2015–2020</td><td class="num">47</td><td class="num">19</td><td class="num">−0.35R</td><td class="num">−1.1</td><td class="num">0.60</td><td class="num">−18.3%</td></tr>
+          <tr><td>EUR/USD · GBP/USD · gold</td><td>2005–2020</td><td class="num">12–48</td><td class="num">8–41</td><td class="num">all negative</td><td class="num">—</td><td class="num">0.27–0.91</td><td class="num">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure class="panel" id="c-gate">
+      <div class="chart-head">
+        <h3>Why the gate exists</h3>
+        <div class="legend"><span><i class="sq" style="background: var(--s1)"></i>Nasdaq-100</span><span><i class="sq" style="background: var(--s2)"></i>S&amp;P 500</span></div>
+      </div>
+      <div class="plotwrap"><div class="plot"></div><div class="tip" hidden></div></div>
+      <figcaption>Expectancy per trade in 2005–2014 for the same breakaway rules at different gate settings, after conservative costs. Ungated, the pattern is roughly break-even. The frozen setting, 1.10, sits in the middle of the range where every exit variant was positive on both indices.</figcaption>
+      <details><summary>Table view</summary><div class="tablewrap"><table id="t-gate"></table></div></details>
+    </figure>
+  </section>
+
+  <section aria-labelledby="h-failed">
+    <h2 id="h-failed">What did not work</h2>
+    <p class="lead">Each concept was turned into exact rules and tested on 2005–2014 data before anything touched the holdout. Roughly 1,000 rule and parameter combinations were tried across five markets.</p>
+    <figure class="panel" id="c-text">
+      <div class="chart-head">
+        <h3>Textbook ICT setups, Nasdaq-100, cumulative R</h3>
+        <div class="legend"><span><i style="background: var(--s3)"></i>ICT 2022 model</span><span><i style="background: var(--s4)"></i>Silver Bullet</span></div>
+      </div>
+      <div class="plotwrap"><div class="plot" tabindex="0" aria-label="Cumulative R of the textbook ICT setups. Use the arrow keys to move through time."></div><div class="tip" hidden></div></div>
+      <figcaption>Liquidity sweep, 1-minute structure shift, FVG entry at the midpoint, 2R target (the 2022 model), and the 10:00–11:00 Silver Bullet with a liquidity target. Both lose steadily in development and in the holdout. A 1-minute FVG stop is only a few points wide, so ordinary costs eat a large share of each trade while the edge before costs is about zero.</figcaption>
+      <details><summary>Table view</summary><div class="tablewrap"><table id="t-text"></table></div></details>
+    </figure>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>ICT concept, as rules</th><th>Result, 2005–2014</th><th>Verdict</th></tr></thead>
+        <tbody>
+          <tr><td>Daily bias: midnight open, previous close location, overnight move, gap, 20-day trend</td><td>Direction hit rate 43–53%</td><td>No signal</td></tr>
+          <tr><td>Liquidity sweep and reclaim of overnight, previous-day, Asia, London and pre-market levels</td><td>−0.11 to +0.19R before costs</td><td>No edge</td></tr>
+          <tr><td>Sweep → structure shift → FVG, IFVG or shift-close entry, 1–15 minute structure (144 variants)</td><td>All negative after costs; best −0.11R</td><td>No edge</td></tr>
+          <tr><td>Adding SMT divergence with ES, or requiring two or more levels swept</td><td>No improvement</td><td>No edge</td></tr>
+          <tr><td>The same reversal model in the London and NY killzones on EUR/USD, GBP/USD and gold</td><td>Mostly negative; best +0.08R, t = 1.0</td><td>No edge</td></tr>
+          <tr><td>Daily power of three as one trade a day, held to the close</td><td>About zero before costs</td><td>No edge</td></tr>
+          <tr><td>Market-maker sequence: opposite side raided first, then the breakaway</td><td>Worse than without it</td><td>Not supported</td></tr>
+          <tr><td>London-open Judas swing</td><td>Negative; the London-open drift is real but smaller than costs</td><td>Not tradeable</td></tr>
+          <tr><td>Opening range gap with its midpoint as a magnet</td><td>Touch rates close to random-walk odds</td><td>No edge</td></tr>
+          <tr><td>Breakaway FVG continuation without a gate</td><td>Negative after costs</td><td>No edge</td></tr>
+          <tr><td><b>Breakaway FVG continuation in volatility expansion</b></td><td><b>Positive on both indices, in both halves</b></td><td><b>Frozen as EBM</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-caveats">
+    <h2 id="h-caveats">Before you trade it</h2>
+    <ul class="plain">
+      <li>The holdout edge isn't statistically significant. At 58 trades, +0.31R per trade is consistent with luck.</li>
+      <li>It's a trend-day catcher. About two in three trades lose, losing streaks run long, and a few days make each year.</li>
+      <li>It didn't transfer. The same rules lost on the S&amp;P 500 holdout and on FX and gold.</li>
+      <li>The data is Oanda's 1-minute mid price, a proxy for CME futures, and it ends in May 2020. Nothing here covers 2021–2026.</li>
+      <li>At 1% risk per trade, the Nasdaq holdout works out to roughly +3% a year with a 7% drawdown. That's a modest return.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="h-test">
+    <h2 id="h-test">Forward-test it</h2>
+    <ol class="steps">
+      <li>Add <code>pine/expansion_breakaway_model.pine</code> to a 1, 3 or 5-minute NQ or MNQ chart in TradingView. It's a Pine v6 strategy written to the same rules; it hasn't been compiled in TradingView yet, so small syntax fixes may be needed.</li>
+      <li>Check the regime panel at the open. When it reads CLOSED, the model has nothing to do today.</li>
+      <li>Paper-trade 30 to 50 signals before risking money, and size live trades at 0.5–1% risk.</li>
+      <li>To re-run the research, see <code>docs/RESEARCH.md</code>. <code>scripts/run_ebm.py</code> runs the frozen model on any period.</li>
+    </ol>
+  </section>
+
+  <footer>
+    <p>Data: Oanda one-minute mid prices, January 2005 to May 2020, from the public FutureSharks/financial-data repository. Fills are conservative: limit orders need a one-tick trade-through, and a bar that touches both stop and target counts as a stop. R is profit or loss divided by the planned stop distance, after costs.</p>
+    <p>Educational research, not financial advice.</p>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const DATA = {"ebm":{"nq":{"d":["2005-10-27","2006-01-24","2006-01-27","2006-01-31","2006-03-10","2006-05-30","2006-06-12","2006-08-07","2007-03-05","2007-03-22","2007-08-03","2007-08-24","2007-08-27","2007-09-07","2007-10-22","2007-11-09","2007-11-13","2007-11-30","2008-01-15","2008-10-01","2008-10-03","2008-10-06","2008-10-08","2008-10-15","2008-11-11","2010-04-30","2010-05-03","2010-05-07","2010-05-20","2010-06-14","2010-06-23","2011-03-04","2011-03-18","2011-03-25","2011-07-29","2011-08-10","2011-09-05","2011-09-08","2011-09-20","2011-10-05","2011-10-11","2012-05-07","2012-05-29","2012-05-31","2012-06-28","2012-11-05","2012-11-09","2012-11-16","2012-11-19","2013-01-04","2013-04-17","2013-04-18","2013-04-25","2013-05-01","2013-06-07","2013-06-13","2013-06-17","2013-06-18","2013-06-20","2013-06-21","2013-06-24","2013-06-25","2013-10-18","2013-10-28","2014-01-27","2014-01-30","2014-04-08","2014-04-14","2014-04-25","2014-05-01","2014-10-01","2014-10-02","2014-10-08","2014-10-16","2014-10-28","2014-11-10","2014-12-18","2014-12-24","2015-02-02","2015-02-11","2015-07-21","2015-09-09","2015-09-30","2016-01-22","2016-01-29","2016-02-12","2016-02-18","2016-07-05","2016-11-09","2016-11-15","2016-11-23","2017-04-17","2017-06-01","2017-06-16","2017-06-21","2017-06-26","2017-08-11","2017-08-28","2017-08-31","2017-12-05","2018-02-07","2018-03-07","2018-03-15","2018-03-28","2018-04-09","2018-04-12","2018-04-24","2018-10-23","2018-10-24","2018-10-31","2018-11-05","2018-11-07","2018-11-09","2018-11-28","2018-12-07","2018-12-12","2018-12-21","2019-01-02","2019-01-15","2019-06-05","2019-06-11","2019-06-17","2019-08-05","2019-08-16","2019-08-22","2019-08-30","2019-09-05","2019-10-08","2020-02-03","2020-02-13","2020-02-26","2020-02-27","2020-03-06","2020-03-13","2020-04-14","2020-04-23"],"v":[6.21,4.97,3.79,2.64,1.41,4.49,3.21,1.96,0.74,-0.48,-1.77,6.92,5.66,6.25,9.16,7.86,17.08,22.67,24.25,23.18,22.13,21.25,20.2,28.0,26.88,33.78,35.61,34.35,33.12,31.99,30.86,29.67,34.19,32.94,31.57,30.46,29.32,28.09,26.78,30.88,31.44,33.36,32.23,31.11,30.62,29.43,28.27,27.1,28.79,27.48,27.02,25.6,24.28,23.02,24.43,32.57,31.37,30.8,42.73,41.51,40.39,39.09,46.78,45.52,44.27,47.03,48.18,46.94,48.08,46.97,49.7,48.6,47.24,47.76,48.8,47.44,46.24,45.12,44.06,42.94,41.74,44.55,43.47,42.4,47.16,46.03,44.9,43.66,52.53,51.37,50.45,53.83,52.54,51.41,53.07,51.95,54.03,52.81,54.3,53.27,52.22,51.18,50.06,48.94,47.9,46.81,51.91,50.81,49.73,50.11,49.06,52.92,53.27,52.18,54.98,53.94,61.13,61.45,62.52,61.38,65.82,65.25,66.55,65.47,64.41,66.09,66.57,65.48,66.95,65.89,64.86,63.83,62.79,61.78,64.21,63.19]},"es":{"d":["2005-10-12","2005-10-24","2006-05-30","2006-06-15","2006-06-22","2006-08-01","2007-01-19","2007-03-05","2007-03-08","2007-03-27","2007-06-12","2007-06-14","2007-06-15","2007-06-27","2007-07-13","2007-07-31","2007-08-08","2007-08-10","2007-08-14","2007-09-10","2007-09-12","2007-11-13","2007-11-23","2008-01-15","2008-07-16","2008-07-22","2008-07-30","2008-10-15","2008-11-11","2008-11-14","2010-02-01","2010-02-17","2010-05-07","2010-05-12","2010-06-14","2010-06-23","2011-03-02","2011-04-01","2011-06-28","2011-07-25","2011-07-27","2011-08-10","2011-08-18","2011-09-14","2011-10-04","2012-04-25","2012-05-29","2012-05-31","2012-06-11","2012-06-12","2012-06-27","2013-01-08","2013-04-22","2013-05-01","2013-06-13","2013-06-17","2013-06-18","2013-06-24","2013-07-01","2013-10-22","2014-02-13","2014-02-14","2014-02-19","2014-02-25","2014-03-18","2014-03-20","2014-04-25","2014-04-30","2014-08-18","2014-08-19","2014-09-23","2014-10-09","2014-10-13","2014-10-23","2015-01-27","2015-02-05","2015-08-27","2015-09-28","2016-01-19","2016-02-03","2016-02-08","2016-02-11","2016-02-12","2016-02-24","2016-07-01","2016-11-29","2017-04-11","2017-04-17","2017-04-25","2017-04-26","2017-08-31","2017-12-05","2018-01-04","2018-01-29","2018-02-06","2018-02-07","2018-02-21","2018-03-07","2018-04-12","2018-04-20","2018-10-17","2018-10-19","2018-10-26","2018-10-31","2018-11-12","2018-12-03","2018-12-06","2018-12-10","2019-01-16","2019-08-09","2019-08-16","2019-08-26","2019-09-05","2019-10-08","2020-02-03","2020-02-04","2020-02-13","2020-02-26","2020-02-27","2020-03-13","2020-04-23"],"v":[-1.45,-2.79,2.52,6.15,7.26,6.11,4.97,3.72,2.33,2.38,1.26,-0.01,-1.2,4.55,3.07,1.79,0.67,-0.47,1.46,0.36,-0.91,3.24,6.59,7.3,13.73,16.85,15.75,19.2,18.16,16.99,15.78,14.51,13.38,12.1,10.84,9.7,8.58,7.18,8.95,8.11,10.66,9.59,10.2,9.01,7.77,6.32,5.14,4.11,5.55,4.3,4.9,3.81,2.42,5.7,17.09,15.94,16.49,15.35,14.07,12.87,15.05,17.38,16.23,14.92,15.96,16.84,18.14,23.44,23.65,25.5,24.43,33.61,32.46,31.43,30.33,29.17,28.07,34.18,32.97,31.92,30.87,29.76,28.62,27.43,26.35,25.14,23.72,31.08,31.5,30.08,28.87,27.6,27.69,26.46,25.4,24.31,23.27,22.23,21.1,22.26,21.17,20.06,18.93,17.87,26.99,26.92,25.81,24.74,23.59,22.53,23.4,22.26,22.31,21.21,19.96,20.15,19.01,17.91,16.91,15.89,14.85]}},"textbook":{"ict":{"d":["2005-01-21","2005-01-28","2005-02-04","2005-02-11","2005-02-18","2005-02-25","2005-03-04","2005-03-11","2005-03-18","2005-03-25","2005-04-01","2005-04-08","2005-04-15","2005-04-22","2005-04-29","2005-05-06","2005-05-13","2005-05-20","2005-05-27","2005-06-03","2005-06-10","2005-06-17","2005-06-24","2005-07-01","2005-07-08","2005-07-15","2005-07-22","2005-07-29","2005-08-05","2005-08-12","2005-08-19","2005-08-26","2005-09-02","2005-09-09","2005-09-16","2005-09-23","2005-09-30","2005-10-07","2005-10-14","2005-10-21","2005-10-28","2005-11-04","2005-11-11","2005-11-18","2005-11-25","2005-12-02","2005-12-09","2005-12-16","2005-12-23","2005-12-30","2006-01-06","2006-01-13","2006-01-20","2006-01-27","2006-02-03","2006-02-10","2006-02-17","2006-02-24","2006-03-03","2006-03-10","2006-03-17","2006-03-24","2006-03-31","2006-04-07","2006-04-14","2006-04-21","2006-04-28","2006-05-05","2006-05-12","2006-05-19","2006-05-26","2006-06-02","2006-06-09","2006-06-16","2006-06-23","2006-06-30","2006-07-07","2006-07-14","2006-07-21","2006-07-28","2006-08-04","2006-08-11","2006-08-18","2006-08-25","2006-09-01","2006-09-08","2006-09-15","2006-09-22","2006-09-29","2006-10-06","2006-10-13","2006-10-20","2006-10-27","2006-11-03","2006-11-10","2006-11-17","2006-11-24","2006-12-01","2006-12-08","2006-12-15","2006-12-22","2006-12-29","2007-01-05","2007-01-12","2007-01-19","2007-01-26","2007-02-02","2007-02-09","2007-02-16","2007-02-23","2007-03-02","2007-03-09","2007-03-16","2007-03-23","2007-03-30","2007-04-06","2007-04-13","2007-04-20","2007-04-27","2007-05-04","2007-05-11","2007-05-18","2007-05-25","2007-06-01","2007-06-08","2007-06-15","2007-06-22","2007-06-29","2007-07-06","2007-07-13","2007-07-20","2007-07-27","2007-08-03","2007-08-10","2007-08-17","2007-08-24","2007-08-31","2007-09-07","2007-09-14","2007-09-21","2007-09-28","2007-10-05","2007-10-12","2007-10-19","2007-10-26","2007-11-02","2007-11-09","2007-11-16","2007-11-23","2007-11-30","2007-12-07","2007-12-14","2007-12-21","2007-12-28","2008-01-04","2008-01-11","2008-01-18","2008-01-25","2008-02-01","2008-02-08","2008-02-15","2008-02-22","2008-02-29","2008-03-07","2008-03-14","2008-03-21","2008-03-28","2008-04-04","2008-04-11","2008-04-18","2008-04-25","2008-05-02","2008-05-09","2008-05-16","2008-05-23","2008-05-30","2008-06-06","2008-06-13","2008-06-20","2008-06-27","2008-07-04","2008-07-11","2008-07-18","2008-07-25","2008-08-01","2008-08-08","2008-08-15","2008-08-22","2008-08-29","2008-09-05","2008-09-12","2008-09-19","2008-09-26","2008-10-03","2008-10-10","2008-10-17","2008-10-24","2008-10-31","2008-11-07","2008-11-14","2008-11-21","2008-11-28","2008-12-05","2008-12-12","2008-12-19","2008-12-26","2009-01-02","2009-01-09","2009-01-16","2009-01-23","2009-01-30","2009-02-06","2009-02-13","2009-02-20","2009-02-27","2009-03-06","2009-03-13","2009-03-20","2009-03-27","2009-04-03","2009-04-10","2009-04-17","2009-04-24","2009-05-01","2009-05-08","2009-05-15","2009-05-22","2009-05-29","2009-06-05","2009-06-12","2009-06-19","2009-06-26","2009-07-03","2009-07-10","2009-07-17","2009-07-24","2009-07-31","2009-08-07","2009-08-14","2009-08-21","2009-08-28","2009-09-04","2009-09-11","2009-09-18","2009-09-25","2009-10-02","2009-10-09","2009-10-16","2009-10-23","2009-10-30","2009-11-06","2009-11-13","2009-11-20","2009-11-27","2009-12-04","2009-12-11","2009-12-18","2009-12-25","2010-01-01","2010-01-08","2010-01-15","2010-01-22","2010-01-29","2010-02-05","2010-02-12","2010-02-19","2010-02-26","2010-03-05","2010-03-12","2010-03-19","2010-03-26","2010-04-02","2010-04-09","2010-04-16","2010-04-23","2010-04-30","2010-05-07","2010-05-14","2010-05-21","2010-05-28","2010-06-04","2010-06-11","2010-06-18","2010-06-25","2010-07-02","2010-07-09","2010-07-16","2010-07-23","2010-07-30","2010-08-06","2010-08-13","2010-08-20","2010-08-27","2010-09-03","2010-09-10","2010-09-17","2010-09-24","2010-10-01","2010-10-08","2010-10-15","2010-10-22","2010-10-29","2010-11-05","2010-11-12","2010-11-19","2010-11-26","2010-12-03","2010-12-10","2010-12-17","2010-12-24","2010-12-31","2011-01-07","2011-01-14","2011-01-21","2011-01-28","2011-02-04","2011-02-11","2011-02-18","2011-02-25","2011-03-04","2011-03-11","2011-03-18","2011-03-25","2011-04-01","2011-04-08","2011-04-15","2011-04-22","2011-04-29","2011-05-06","2011-05-13","2011-05-20","2011-05-27","2011-06-03","2011-06-10","2011-06-17","2011-06-24","2011-07-01","2011-07-08","2011-07-15","2011-07-22","2011-07-29","2011-08-05","2011-08-12","2011-08-19","2011-08-26","2011-09-02","2011-09-09","2011-09-16","2011-09-23","2011-09-30","2011-10-07","2011-10-14","2011-10-21","2011-10-28","2011-11-04","2011-11-11","2011-11-18","2011-11-25","2011-12-02","2011-12-09","2011-12-16","2011-12-23","2011-12-30","2012-01-06","2012-01-13","2012-01-20","2012-01-27","2012-02-03","2012-02-10","2012-02-17","2012-02-24","2012-03-02","2012-03-09","2012-03-16","2012-03-23","2012-03-30","2012-04-06","2012-04-13","2012-04-20","2012-04-27","2012-05-04","2012-05-11","2012-05-18","2012-05-25","2012-06-01","2012-06-08","2012-06-15","2012-06-22","2012-06-29","2012-07-06","2012-07-13","2012-07-20","2012-07-27","2012-08-03","2012-08-10","2012-08-17","2012-08-24","2012-08-31","2012-09-07","2012-09-14","2012-09-21","2012-09-28","2012-10-05","2012-10-12","2012-10-19","2012-10-26","2012-11-02","2012-11-09","2012-11-16","2012-11-23","2012-11-30","2012-12-07","2012-12-14","2012-12-21","2012-12-28","2013-01-04","2013-01-11","2013-01-18","2013-01-25","2013-02-01","2013-02-08","2013-02-15","2013-02-22","2013-03-01","2013-03-08","2013-03-15","2013-03-22","2013-03-29","2013-04-05","2013-04-12","2013-04-19","2013-04-26","2013-05-03","2013-05-10","2013-05-17","2013-05-24","2013-05-31","2013-06-07","2013-06-14","2013-06-21","2013-06-28","2013-07-05","2013-07-12","2013-07-19","2013-07-26","2013-08-02","2013-08-09","2013-08-16","2013-08-23","2013-08-30","2013-09-06","2013-09-13","2013-09-20","2013-09-27","2013-10-04","2013-10-11","2013-10-18","2013-10-25","2013-11-01","2013-11-08","2013-11-15","2013-11-22","2013-11-29","2013-12-06","2013-12-13","2013-12-20","2013-12-27","2014-01-03","2014-01-10","2014-01-17","2014-01-24","2014-01-31","2014-02-07","2014-02-14","2014-02-21","2014-02-28","2014-03-07","2014-03-14","2014-03-21","2014-03-28","2014-04-04","2014-04-11","2014-04-18","2014-04-25","2014-05-02","2014-05-09","2014-05-16","2014-05-23","2014-05-30","2014-06-06","2014-06-13","2014-06-20","2014-06-27","2014-07-04","2014-07-11","2014-07-18","2014-07-25","2014-08-01","2014-08-08","2014-08-15","2014-08-22","2014-08-29","2014-09-05","2014-09-12","2014-09-19","2014-09-26","2014-10-03","2014-10-10","2014-10-17","2014-10-24","2014-10-31","2014-11-07","2014-11-14","2014-11-21","2014-11-28","2014-12-05","2014-12-12","2014-12-19","2014-12-26","2015-01-02","2015-01-09","2015-01-16","2015-01-23","2015-01-30","2015-02-06","2015-02-13","2015-02-20","2015-02-27","2015-03-06","2015-03-13","2015-03-20","2015-03-27","2015-04-03","2015-04-10","2015-04-17","2015-04-24","2015-05-01","2015-05-08","2015-05-15","2015-05-22","2015-05-29","2015-06-05","2015-06-12","2015-06-19","2015-06-26","2015-07-03","2015-07-10","2015-07-17","2015-07-24","2015-07-31","2015-08-07","2015-08-14","2015-08-21","2015-08-28","2015-09-04","2015-09-11","2015-09-18","2015-09-25","2015-10-02","2015-10-09","2015-10-16","2015-10-23","2015-10-30","2015-11-06","2015-11-13","2015-11-20","2015-11-27","2015-12-04","2015-12-11","2015-12-18","2015-12-25","2016-01-01","2016-01-08","2016-01-15","2016-01-22","2016-01-29","2016-02-05","2016-02-12","2016-02-19","2016-02-26","2016-03-04","2016-03-11","2016-03-18","2016-03-25","2016-04-01","2016-04-08","2016-04-15","2016-04-22","2016-04-29","2016-05-06","2016-05-13","2016-05-20","2016-05-27","2016-06-03","2016-06-10","2016-06-17","2016-06-24","2016-07-01","2016-07-08","2016-07-15","2016-07-22","2016-07-29","2016-08-05","2016-08-12","2016-08-19","2016-08-26","2016-09-02","2016-09-09","2016-09-16","2016-09-23","2016-09-30","2016-10-07","2016-10-14","2016-10-21","2016-10-28","2016-11-04","2016-11-11","2016-11-18","2016-11-25","2016-12-02","2016-12-09","2016-12-16","2016-12-23","2016-12-30","2017-01-06","2017-01-13","2017-01-20","2017-01-27","2017-02-03","2017-02-10","2017-02-17","2017-02-24","2017-03-03","2017-03-10","2017-03-17","2017-03-24","2017-03-31","2017-04-07","2017-04-14","2017-04-21","2017-04-28","2017-05-05","2017-05-12","2017-05-19","2017-05-26","2017-06-02","2017-06-09","2017-06-16","2017-06-23","2017-06-30","2017-07-07","2017-07-14","2017-07-21","2017-07-28","2017-08-04","2017-08-11","2017-08-18","2017-08-25","2017-09-01","2017-09-08","2017-09-15","2017-09-22","2017-09-29","2017-10-06","2017-10-13","2017-10-20","2017-10-27","2017-11-03","2017-11-10","2017-11-17","2017-11-24","2017-12-01","2017-12-08","2017-12-15","2017-12-22","2017-12-29","2018-01-05","2018-01-12","2018-01-19","2018-01-26","2018-02-02","2018-02-09","2018-02-16","2018-02-23","2018-03-02","2018-03-09","2018-03-16","2018-03-23","2018-03-30","2018-04-06","2018-04-13","2018-04-20","2018-04-27","2018-05-04","2018-05-11","2018-05-18","2018-05-25","2018-06-01","2018-06-08","2018-06-15","2018-06-22","2018-06-29","2018-07-06","2018-07-13","2018-07-20","2018-07-27","2018-08-03","2018-08-10","2018-08-17","2018-08-24","2018-08-31","2018-09-07","2018-09-14","2018-09-21","2018-09-28","2018-10-05","2018-10-12","2018-10-19","2018-10-26","2018-11-02","2018-11-09","2018-11-16","2018-11-23","2018-11-30","2018-12-07","2018-12-14","2018-12-21","2018-12-28","2019-01-04","2019-01-11","2019-01-18","2019-01-25","2019-02-01","2019-02-08","2019-02-15","2019-02-22","2019-03-01","2019-03-08","2019-03-15","2019-03-22","2019-03-29","2019-04-05","2019-04-12","2019-04-19","2019-04-26","2019-05-03","2019-05-10","2019-05-17","2019-05-24","2019-05-31","2019-06-07","2019-06-14","2019-06-21","2019-06-28","2019-07-05","2019-07-12","2019-07-19","2019-07-26","2019-08-02","2019-08-09","2019-08-16","2019-08-23","2019-08-30","2019-09-06","2019-09-13","2019-09-20","2019-09-27","2019-10-04","2019-10-11","2019-10-18","2019-10-25","2019-11-01","2019-11-08","2019-11-15","2019-11-22","2019-11-29","2019-12-06","2019-12-13","2019-12-20","2019-12-27","2020-01-03","2020-01-10","2020-01-17","2020-01-24","2020-01-31","2020-02-07","2020-02-14","2020-02-21","2020-02-28","2020-03-06","2020-03-13","2020-03-20","2020-03-27","2020-04-03","2020-04-10","2020-04-17","2020-04-24","2020-05-01","2020-05-08","2020-05-15"],"v":[-1.2,-5.4,-7.0,-7.8,-11.6,-10.6,-8.1,-10.5,-10.6,-8.4,-14.8,-14.4,-16.8,-18.9,-19.8,-18.0,-24.6,-25.6,-31.4,-30.0,-29.6,-26.8,-30.3,-32.8,-36.8,-36.7,-34.2,-39.3,-34.8,-39.3,-40.3,-38.5,-37.0,-40.0,-42.7,-45.3,-46.6,-49.2,-49.6,-47.4,-50.5,-49.6,-53.5,-58.9,-58.1,-60.7,-60.3,-59.9,-59.5,-55.4,-58.3,-63.0,-65.6,-66.4,-70.1,-70.3,-73.8,-76.1,-77.2,-76.2,-78.8,-78.8,-85.3,-89.4,-92.9,-92.3,-95.9,-97.8,-101.8,-101.3,-99.2,-104.2,-107.0,-104.9,-107.3,-108.2,-108.6,-110.8,-107.2,-106.5,-104.2,-107.5,-105.9,-108.9,-111.4,-111.0,-107.3,-106.7,-108.9,-111.0,-111.5,-107.7,-110.3,-113.7,-119.0,-118.6,-119.2,-122.7,-126.0,-127.1,-125.2,-125.2,-127.6,-133.1,-135.7,-142.1,-138.3,-139.1,-140.4,-141.9,-146.8,-144.6,-142.3,-141.8,-144.7,-145.5,-148.8,-154.6,-153.9,-154.9,-157.6,-158.5,-162.2,-160.0,-166.0,-165.7,-166.9,-172.8,-174.6,-177.2,-182.8,-184.6,-190.4,-193.5,-196.1,-195.7,-194.0,-194.9,-197.5,-199.1,-198.2,-203.8,-200.5,-201.9,-202.5,-200.1,-201.9,-205.6,-201.8,-202.2,-201.4,-201.9,-205.8,-206.8,-210.4,-209.2,-210.8,-212.3,-212.3,-214.7,-212.3,-215.6,-218.2,-219.0,-220.8,-221.2,-227.5,-223.5,-227.2,-229.6,-230.3,-235.8,-234.8,-233.9,-234.2,-235.0,-232.7,-228.2,-224.3,-226.2,-229.0,-233.6,-239.5,-245.7,-248.0,-248.2,-249.8,-250.4,-253.5,-258.8,-256.6,-257.3,-260.9,-266.7,-265.0,-263.4,-264.8,-266.4,-261.8,-267.6,-267.4,-268.1,-266.9,-266.8,-267.4,-269.8,-272.7,-276.8,-272.6,-275.4,-274.9,-274.5,-276.4,-277.2,-277.3,-279.3,-284.1,-285.8,-286.2,-291.3,-290.9,-287.1,-290.2,-290.7,-293.2,-296.4,-296.1,-297.1,-298.0,-299.5,-301.4,-303.5,-298.5,-300.8,-304.7,-304.0,-306.3,-308.4,-312.6,-313.5,-313.2,-311.3,-315.4,-321.4,-326.5,-328.7,-327.7,-325.9,-328.9,-332.2,-334.8,-336.4,-335.8,-338.0,-339.9,-337.8,-339.3,-343.6,-345.2,-345.7,-344.4,-348.1,-350.0,-353.7,-355.7,-359.6,-359.0,-361.9,-364.3,-369.7,-373.6,-376.4,-377.7,-378.8,-379.8,-383.8,-387.5,-389.9,-392.6,-395.0,-394.5,-391.7,-391.1,-392.0,-392.9,-391.9,-393.0,-395.2,-396.1,-393.7,-391.4,-393.6,-395.6,-397.6,-401.8,-404.1,-406.7,-408.4,-411.0,-411.9,-413.8,-413.4,-418.6,-419.4,-421.7,-424.4,-427.9,-429.1,-429.9,-432.9,-434.8,-439.2,-435.3,-439.3,-441.8,-438.1,-441.6,-445.9,-450.1,-452.4,-457.7,-460.7,-462.6,-464.8,-462.2,-461.4,-460.7,-461.2,-461.9,-465.1,-470.2,-471.3,-472.8,-474.5,-476.2,-475.3,-480.8,-485.2,-484.2,-486.2,-486.2,-484.9,-488.2,-488.6,-490.2,-490.2,-488.0,-486.1,-481.7,-478.0,-480.9,-474.8,-478.4,-477.8,-477.0,-479.4,-479.2,-478.7,-478.9,-482.4,-483.3,-489.7,-487.6,-487.1,-488.2,-493.7,-491.8,-496.3,-502.6,-505.5,-507.4,-504.9,-504.0,-506.3,-509.4,-511.4,-516.5,-522.6,-524.8,-525.3,-531.0,-529.8,-533.5,-538.6,-536.3,-539.1,-542.5,-544.9,-547.3,-551.5,-552.4,-551.7,-550.5,-549.6,-551.8,-558.3,-559.3,-557.0,-556.0,-559.9,-559.6,-556.8,-561.9,-563.8,-567.4,-566.2,-567.1,-572.2,-574.3,-572.0,-575.6,-574.4,-579.5,-574.5,-575.5,-576.5,-583.1,-582.0,-582.6,-583.7,-580.1,-583.0,-581.2,-584.4,-585.1,-589.1,-594.1,-596.4,-598.6,-598.1,-601.0,-603.3,-607.0,-607.6,-612.0,-610.7,-615.8,-619.6,-624.3,-626.4,-625.3,-630.3,-633.8,-635.6,-635.4,-633.9,-632.3,-636.2,-635.7,-639.4,-641.8,-641.0,-640.4,-637.9,-637.9,-638.2,-641.6,-644.2,-642.9,-646.8,-644.0,-645.9,-651.1,-649.5,-648.5,-654.3,-655.0,-657.6,-663.2,-666.8,-666.6,-669.6,-664.1,-663.5,-662.4,-662.2,-665.2,-666.8,-667.7,-672.5,-677.1,-682.7,-687.0,-690.7,-692.4,-692.8,-695.5,-696.1,-695.4,-696.3,-691.2,-692.4,-697.3,-701.6,-700.6,-701.5,-703.5,-705.4,-707.2,-713.6,-718.5,-718.0,-717.6,-722.2,-722.1,-728.0,-727.4,-724.8,-728.0,-733.7,-732.6,-733.7,-735.5,-736.3,-734.1,-733.4,-735.0,-735.4,-740.2,-738.0,-741.4,-740.6,-733.2,-732.7,-726.3,-727.9,-733.3,-731.9,-736.9,-740.5,-742.1,-741.9,-741.8,-742.4,-742.2,-741.1,-740.9,-741.4,-743.0,-741.8,-745.6,-742.2,-742.0,-744.1,-743.5,-740.4,-743.8,-744.4,-747.8,-743.4,-745.0,-749.6,-748.2,-748.4,-749.6,-752.9,-754.4,-754.0,-755.1,-756.1,-759.4,-764.2,-766.0,-768.2,-772.9,-777.6,-779.6,-781.9,-782.2,-783.7,-781.2,-784.9,-790.7,-789.2,-784.4,-783.6,-780.9,-785.2,-785.8,-786.2,-786.4,-787.9,-786.5,-790.1,-787.1,-786.9,-786.8,-781.4,-784.6,-787.3,-790.1,-796.0,-800.7,-800.3,-803.8,-810.2,-814.1,-814.6,-819.6,-821.6,-818.9,-820.4,-825.6,-823.6,-825.6,-823.3,-825.3,-830.1,-832.8,-839.0,-840.8,-843.1,-840.8,-844.1,-849.0,-854.5,-859.1,-854.7,-856.5,-861.8,-861.9,-865.0,-868.0,-862.5,-864.1,-867.1,-869.5,-868.7,-872.2,-871.3,-875.4,-876.4,-874.0,-877.0,-878.0,-882.9,-882.8,-888.9,-893.9,-895.4,-892.1,-891.2,-893.5,-894.4,-893.4,-894.1,-897.4,-899.9,-903.3,-901.8,-905.1,-905.5,-908.4,-910.1,-906.6,-908.3,-908.8,-908.8,-913.7,-915.2,-915.6,-915.2,-915.6,-919.4,-922.2,-924.2,-927.6,-933.5,-937.2,-942.2,-941.2,-943.8,-942.3,-943.0,-944.5,-944.9,-946.0,-947.6,-947.4,-947.7,-947.1,-948.2,-947.7,-951.0,-948.2,-951.6,-951.0,-953.5,-948.7,-949.9,-952.4,-952.8,-955.1,-958.5,-960.0,-961.5,-962.9,-962.1,-964.6,-967.7,-968.0,-972.2,-972.5,-971.0,-966.5,-966.2,-969.3,-965.0,-960.4,-961.9,-960.5,-962.6,-966.9,-971.4,-972.8,-974.4,-974.5,-979.8,-980.0,-981.1,-980.4,-982.8,-983.3,-979.6,-979.7,-984.9,-986.2,-984.3,-985.6,-985.8,-988.3,-985.6,-987.0,-988.5,-986.8,-990.4,-985.9,-983.2,-985.3,-990.9,-991.4,-993.9,-997.9,-997.2,-995.6,-998.0,-999.3,-1003.6,-1005.1,-1007.4,-1011.3,-1011.6,-1017.1,-1018.5,-1017.4,-1017.9,-1021.3,-1022.7,-1024.0,-1024.2,-1023.6,-1021.6,-1021.8,-1026.1,-1022.5,-1028.1,-1028.4,-1027.8,-1029.2,-1033.7,-1036.1,-1037.5,-1031.2,-1030.4,-1034.8,-1039.3,-1039.6,-1039.9,-1043.6,-1043.8,-1042.5,-1039.7,-1041.1,-1038.4,-1034.9,-1036.9,-1041.1,-1040.2,-1039.5,-1039.6,-1036.6,-1037.7,-1036.8,-1037.9,-1035.0,-1032.1,-1031.4,-1027.4,-1029.5,-1031.6]},"sb":{"d":["2005-01-21","2005-01-28","2005-02-11","2005-02-18","2005-02-25","2005-03-04","2005-03-11","2005-03-18","2005-03-25","2005-04-01","2005-04-08","2005-04-22","2005-04-29","2005-05-06","2005-05-13","2005-05-20","2005-05-27","2005-06-03","2005-06-10","2005-06-17","2005-06-24","2005-07-01","2005-07-08","2005-07-15","2005-07-29","2005-08-05","2005-08-12","2005-08-19","2005-08-26","2005-09-02","2005-09-09","2005-09-16","2005-09-23","2005-09-30","2005-10-07","2005-10-14","2005-10-21","2005-10-28","2005-11-11","2005-11-18","2005-11-25","2005-12-02","2005-12-09","2005-12-16","2005-12-23","2005-12-30","2006-01-06","2006-01-13","2006-01-20","2006-01-27","2006-02-03","2006-02-10","2006-02-17","2006-02-24","2006-03-03","2006-03-10","2006-03-17","2006-03-24","2006-03-31","2006-04-07","2006-04-14","2006-04-21","2006-04-28","2006-05-05","2006-05-19","2006-05-26","2006-06-02","2006-06-09","2006-06-16","2006-06-23","2006-07-14","2006-07-21","2006-07-28","2006-08-11","2006-08-18","2006-09-01","2006-09-15","2006-09-22","2006-09-29","2006-10-13","2006-10-20","2006-10-27","2006-11-03","2006-11-10","2006-11-17","2006-11-24","2006-12-01","2006-12-08","2006-12-22","2006-12-29","2007-01-05","2007-01-12","2007-01-19","2007-01-26","2007-02-02","2007-02-09","2007-02-16","2007-02-23","2007-03-02","2007-03-09","2007-03-16","2007-03-23","2007-03-30","2007-04-06","2007-04-13","2007-04-20","2007-04-27","2007-05-04","2007-05-11","2007-05-18","2007-05-25","2007-06-01","2007-06-08","2007-06-15","2007-06-22","2007-06-29","2007-07-06","2007-07-13","2007-07-20","2007-07-27","2007-08-03","2007-08-10","2007-08-17","2007-08-31","2007-09-07","2007-09-14","2007-09-21","2007-09-28","2007-10-05","2007-10-12","2007-10-19","2007-10-26","2007-11-02","2007-11-09","2007-11-16","2007-11-23","2007-11-30","2007-12-07","2007-12-14","2007-12-21","2007-12-28","2008-01-04","2008-01-11","2008-01-18","2008-01-25","2008-02-01","2008-02-15","2008-02-22","2008-02-29","2008-03-07","2008-03-14","2008-03-21","2008-03-28","2008-04-04","2008-04-11","2008-04-18","2008-04-25","2008-05-02","2008-05-09","2008-05-16","2008-05-23","2008-05-30","2008-06-06","2008-06-13","2008-06-20","2008-06-27","2008-07-04","2008-07-11","2008-07-18","2008-07-25","2008-08-01","2008-08-08","2008-08-15","2008-08-22","2008-08-29","2008-09-05","2008-09-12","2008-09-19","2008-09-26","2008-10-03","2008-10-10","2008-10-17","2008-10-24","2008-10-31","2008-11-07","2008-11-14","2008-11-21","2008-11-28","2008-12-05","2008-12-12","2008-12-19","2009-01-02","2009-01-09","2009-01-16","2009-01-23","2009-01-30","2009-02-13","2009-02-27","2009-03-06","2009-03-13","2009-03-20","2009-03-27","2009-04-03","2009-04-17","2009-04-24","2009-05-01","2009-05-08","2009-05-15","2009-05-22","2009-05-29","2009-06-05","2009-06-19","2009-06-26","2009-07-03","2009-07-10","2009-07-17","2009-07-24","2009-07-31","2009-08-07","2009-08-14","2009-08-21","2009-08-28","2009-09-04","2009-09-11","2009-09-18","2009-09-25","2009-10-02","2009-10-09","2009-10-16","2009-10-23","2009-10-30","2009-11-06","2009-11-20","2009-11-27","2009-12-11","2009-12-25","2010-01-08","2010-01-15","2010-01-22","2010-01-29","2010-02-12","2010-02-19","2010-02-26","2010-03-05","2010-03-12","2010-03-19","2010-03-26","2010-04-02","2010-04-09","2010-04-16","2010-04-23","2010-04-30","2010-05-14","2010-05-21","2010-05-28","2010-06-04","2010-06-11","2010-06-18","2010-06-25","2010-07-02","2010-07-09","2010-07-16","2010-07-23","2010-07-30","2010-08-06","2010-08-13","2010-08-20","2010-08-27","2010-09-03","2010-09-10","2010-09-17","2010-09-24","2010-10-01","2010-10-08","2010-10-15","2010-10-22","2010-11-05","2010-11-12","2010-11-19","2010-11-26","2010-12-03","2010-12-10","2010-12-17","2010-12-24","2011-01-07","2011-01-14","2011-01-21","2011-01-28","2011-02-04","2011-02-11","2011-02-18","2011-02-25","2011-03-04","2011-03-11","2011-03-18","2011-03-25","2011-04-01","2011-04-08","2011-04-15","2011-04-22","2011-04-29","2011-05-06","2011-05-13","2011-05-20","2011-06-03","2011-06-10","2011-06-17","2011-07-01","2011-07-08","2011-07-15","2011-07-22","2011-07-29","2011-08-05","2011-08-12","2011-08-19","2011-08-26","2011-09-02","2011-09-09","2011-09-16","2011-09-23","2011-09-30","2011-10-07","2011-10-14","2011-10-21","2011-10-28","2011-11-04","2011-11-11","2011-11-18","2011-11-25","2011-12-02","2011-12-09","2011-12-16","2011-12-23","2011-12-30","2012-01-13","2012-01-20","2012-02-03","2012-02-10","2012-02-17","2012-02-24","2012-03-02","2012-03-09","2012-03-16","2012-03-23","2012-03-30","2012-04-06","2012-04-20","2012-04-27","2012-05-04","2012-05-11","2012-05-18","2012-05-25","2012-06-08","2012-06-15","2012-06-22","2012-06-29","2012-07-06","2012-07-20","2012-07-27","2012-08-03","2012-08-10","2012-08-17","2012-08-24","2012-08-31","2012-09-07","2012-09-14","2012-09-21","2012-09-28","2012-10-05","2012-10-12","2012-10-19","2012-10-26","2012-11-02","2012-11-09","2012-11-16","2012-11-23","2012-12-07","2012-12-14","2012-12-21","2012-12-28","2013-01-04","2013-01-11","2013-01-25","2013-02-01","2013-02-15","2013-02-22","2013-03-01","2013-03-08","2013-03-15","2013-03-22","2013-03-29","2013-04-05","2013-04-12","2013-04-19","2013-04-26","2013-05-03","2013-05-10","2013-05-17","2013-05-24","2013-05-31","2013-06-07","2013-06-14","2013-06-21","2013-06-28","2013-07-05","2013-07-12","2013-07-19","2013-07-26","2013-08-02","2013-08-09","2013-08-16","2013-08-23","2013-08-30","2013-09-06","2013-09-13","2013-09-20","2013-09-27","2013-10-11","2013-10-18","2013-10-25","2013-11-01","2013-11-08","2013-11-15","2013-11-22","2013-11-29","2013-12-06","2013-12-13","2013-12-20","2013-12-27","2014-01-03","2014-01-10","2014-01-17","2014-01-24","2014-01-31","2014-02-21","2014-03-07","2014-03-14","2014-04-04","2014-04-11","2014-04-18","2014-04-25","2014-05-02","2014-05-09","2014-05-16","2014-05-23","2014-05-30","2014-06-06","2014-06-13","2014-06-20","2014-06-27","2014-07-11","2014-07-18","2014-07-25","2014-08-01","2014-08-15","2014-08-22","2014-09-05","2014-09-12","2014-09-19","2014-09-26","2014-10-03","2014-10-10","2014-10-17","2014-10-24","2014-10-31","2014-11-07","2014-11-14","2014-11-28","2014-12-05","2014-12-12","2014-12-19","2014-12-26","2015-01-02","2015-01-09","2015-01-16","2015-01-23","2015-01-30","2015-02-06","2015-02-13","2015-02-20","2015-02-27","2015-03-06","2015-03-13","2015-03-20","2015-03-27","2015-04-03","2015-04-10","2015-04-17","2015-04-24","2015-05-08","2015-05-15","2015-05-22","2015-06-05","2015-06-12","2015-06-26","2015-07-03","2015-07-10","2015-07-17","2015-07-24","2015-07-31","2015-08-07","2015-08-14","2015-08-21","2015-08-28","2015-09-04","2015-09-11","2015-09-18","2015-09-25","2015-10-02","2015-10-09","2015-10-16","2015-10-23","2015-10-30","2015-11-06","2015-11-13","2015-11-20","2015-11-27","2015-12-04","2015-12-11","2015-12-18","2015-12-25","2016-01-08","2016-01-15","2016-01-22","2016-01-29","2016-02-05","2016-02-12","2016-02-19","2016-02-26","2016-03-04","2016-03-11","2016-03-18","2016-04-01","2016-04-08","2016-04-15","2016-04-22","2016-04-29","2016-05-06","2016-05-13","2016-05-27","2016-06-03","2016-06-10","2016-06-17","2016-07-01","2016-07-08","2016-07-15","2016-07-22","2016-07-29","2016-08-05","2016-08-12","2016-08-19","2016-08-26","2016-09-02","2016-09-09","2016-09-16","2016-09-23","2016-09-30","2016-10-07","2016-10-14","2016-10-21","2016-11-04","2016-11-11","2016-11-18","2016-11-25","2016-12-02","2016-12-09","2016-12-16","2016-12-23","2016-12-30","2017-01-06","2017-01-13","2017-01-20","2017-01-27","2017-02-03","2017-02-10","2017-02-17","2017-02-24","2017-03-03","2017-03-10","2017-03-17","2017-03-24","2017-03-31","2017-04-07","2017-04-14","2017-04-21","2017-04-28","2017-05-05","2017-05-12","2017-05-19","2017-05-26","2017-06-02","2017-06-09","2017-06-16","2017-06-23","2017-06-30","2017-07-14","2017-07-21","2017-07-28","2017-08-04","2017-08-11","2017-08-18","2017-08-25","2017-09-01","2017-09-08","2017-09-15","2017-09-22","2017-09-29","2017-10-06","2017-10-13","2017-10-20","2017-10-27","2017-11-03","2017-11-10","2017-11-17","2017-11-24","2017-12-01","2017-12-08","2017-12-15","2017-12-22","2018-01-05","2018-01-12","2018-01-19","2018-01-26","2018-02-02","2018-02-09","2018-02-16","2018-02-23","2018-03-09","2018-03-16","2018-03-23","2018-03-30","2018-04-06","2018-04-13","2018-04-20","2018-04-27","2018-05-04","2018-05-11","2018-05-18","2018-05-25","2018-06-01","2018-06-15","2018-06-29","2018-07-06","2018-07-13","2018-07-20","2018-07-27","2018-08-03","2018-08-10","2018-08-17","2018-08-24","2018-08-31","2018-09-07","2018-09-14","2018-09-21","2018-09-28","2018-10-05","2018-10-12","2018-10-19","2018-10-26","2018-11-02","2018-11-09","2018-11-16","2018-11-30","2018-12-07","2018-12-14","2018-12-21","2018-12-28","2019-01-04","2019-01-11","2019-01-18","2019-01-25","2019-02-01","2019-02-08","2019-02-15","2019-02-22","2019-03-01","2019-03-08","2019-03-15","2019-03-22","2019-03-29","2019-04-05","2019-04-12","2019-04-19","2019-04-26","2019-05-03","2019-05-10","2019-05-17","2019-05-24","2019-05-31","2019-06-07","2019-06-14","2019-06-21","2019-06-28","2019-07-05","2019-07-12","2019-07-19","2019-07-26","2019-08-02","2019-08-09","2019-08-16","2019-08-23","2019-08-30","2019-09-06","2019-09-13","2019-09-20","2019-09-27","2019-10-04","2019-10-11","2019-10-18","2019-10-25","2019-11-01","2019-11-08","2019-11-15","2019-11-22","2019-11-29","2019-12-06","2019-12-13","2019-12-27","2020-01-03","2020-01-10","2020-01-24","2020-01-31","2020-02-07","2020-02-14","2020-02-21","2020-02-28","2020-03-06","2020-03-13","2020-03-20","2020-03-27","2020-04-03","2020-04-10","2020-04-17","2020-04-24","2020-05-01","2020-05-08","2020-05-15"],"v":[-1.2,-3.8,-5.2,-3.1,-6.8,-9.1,-3.4,-8.5,-8.1,-9.5,-9.3,-10.5,-10.1,-11.4,-12.5,-13.8,-13.8,-12.6,-15.3,-16.3,-13.6,-16.3,-17.5,-17.2,-18.5,-19.7,-21.0,-26.8,-28.8,-30.1,-31.4,-32.8,-35.1,-33.2,-31.1,-31.0,-31.2,-36.5,-40.6,-43.2,-44.4,-43.8,-45.3,-47.8,-47.5,-48.9,-51.3,-52.6,-53.9,-53.0,-54.3,-55.6,-53.3,-53.3,-49.8,-48.3,-49.1,-47.2,-42.4,-46.4,-47.6,-49.0,-48.3,-50.9,-55.3,-56.6,-57.8,-59.1,-61.9,-64.5,-64.9,-68.7,-70.0,-70.0,-71.3,-75.7,-69.8,-69.7,-70.9,-69.2,-70.5,-67.7,-68.9,-72.5,-71.9,-70.6,-72.9,-74.8,-76.4,-77.9,-72.0,-74.7,-77.6,-76.2,-78.3,-76.1,-74.6,-74.9,-75.9,-79.6,-83.3,-84.8,-86.1,-88.1,-85.9,-84.7,-87.5,-91.4,-95.7,-96.7,-93.3,-94.3,-96.3,-97.6,-99.8,-101.2,-105.9,-109.9,-112.4,-106.4,-108.7,-106.0,-108.5,-110.8,-110.6,-109.8,-112.8,-111.6,-114.1,-117.3,-118.3,-116.6,-117.8,-114.3,-110.7,-111.8,-116.6,-119.3,-120.7,-124.4,-122.0,-123.3,-125.9,-128.2,-128.6,-126.4,-127.5,-132.3,-133.7,-134.9,-133.4,-132.3,-133.8,-128.8,-132.7,-136.8,-132.2,-132.9,-135.4,-134.8,-132.4,-133.6,-131.8,-131.4,-132.1,-133.2,-131.2,-130.6,-131.1,-132.3,-128.2,-132.0,-131.6,-135.5,-138.1,-141.7,-140.8,-142.6,-142.3,-143.6,-142.2,-142.2,-141.2,-142.3,-143.5,-145.8,-148.0,-147.6,-144.7,-147.2,-146.9,-147.2,-151.3,-152.4,-155.0,-158.1,-156.0,-159.7,-163.8,-164.9,-156.0,-155.5,-156.4,-156.2,-155.9,-158.6,-154.3,-155.5,-154.7,-157.3,-155.6,-157.6,-161.5,-162.8,-167.7,-170.2,-169.9,-172.2,-174.5,-175.7,-174.2,-176.5,-177.6,-179.0,-181.8,-181.2,-183.5,-181.3,-182.6,-179.2,-177.3,-179.5,-180.8,-182.2,-184.8,-186.0,-188.1,-186.6,-189.1,-194.0,-195.3,-196.6,-199.3,-200.7,-200.3,-202.8,-204.3,-206.9,-204.1,-204.0,-206.5,-207.7,-208.9,-214.6,-214.2,-216.7,-211.8,-206.9,-206.1,-205.2,-200.6,-197.8,-197.2,-199.7,-201.0,-199.7,-202.4,-203.4,-204.0,-205.2,-202.8,-204.2,-204.1,-204.5,-206.2,-207.7,-213.6,-216.1,-214.4,-216.0,-218.4,-221.5,-222.9,-224.7,-227.5,-221.9,-217.0,-216.9,-218.1,-220.8,-223.5,-224.7,-227.2,-226.0,-229.1,-230.3,-232.7,-235.5,-234.3,-235.6,-237.8,-237.9,-240.3,-245.1,-247.8,-249.5,-248.8,-250.1,-253.4,-255.7,-252.7,-250.8,-251.9,-249.9,-245.9,-250.4,-251.3,-250.7,-250.4,-252.9,-254.0,-251.9,-255.4,-255.0,-256.2,-257.3,-258.5,-259.3,-260.5,-261.7,-264.0,-263.4,-264.6,-262.8,-264.0,-263.1,-260.9,-262.2,-263.1,-263.1,-264.4,-264.3,-267.0,-266.7,-265.1,-267.9,-270.2,-271.0,-271.6,-269.9,-272.3,-273.0,-274.1,-272.2,-274.2,-275.4,-276.6,-272.3,-274.7,-278.3,-280.9,-282.3,-283.6,-283.2,-282.9,-284.0,-286.9,-289.6,-287.6,-288.9,-290.1,-287.5,-288.7,-293.7,-296.3,-297.8,-300.2,-301.4,-302.8,-304.6,-305.7,-306.8,-308.0,-307.2,-303.2,-304.4,-307.1,-312.4,-311.8,-309.4,-311.1,-303.6,-306.0,-309.3,-306.8,-304.4,-300.9,-304.7,-298.3,-301.2,-304.8,-306.8,-308.1,-308.9,-307.3,-305.8,-307.3,-304.5,-307.5,-304.7,-305.2,-306.4,-308.8,-312.9,-315.2,-317.7,-319.0,-317.6,-317.8,-320.2,-320.6,-323.1,-325.5,-323.8,-324.6,-326.9,-326.7,-328.0,-327.2,-328.8,-332.7,-333.9,-335.0,-336.2,-335.6,-336.8,-338.0,-337.8,-338.4,-339.5,-337.7,-340.0,-340.3,-343.6,-345.0,-344.6,-342.9,-338.4,-338.3,-339.0,-341.5,-335.6,-333.7,-334.5,-337.1,-339.4,-341.8,-344.2,-348.1,-351.5,-354.0,-350.0,-351.0,-351.8,-353.0,-354.2,-357.9,-358.9,-360.4,-358.2,-352.7,-353.9,-355.2,-353.4,-354.5,-351.2,-353.5,-351.2,-353.8,-355.2,-353.1,-353.2,-353.8,-357.4,-352.0,-354.4,-353.8,-355.0,-356.2,-358.5,-353.4,-355.8,-349.8,-351.0,-349.2,-349.8,-350.9,-352.2,-354.7,-349.3,-352.8,-351.8,-350.3,-351.0,-350.3,-352.6,-353.3,-354.5,-349.5,-352.3,-356.0,-358.3,-359.5,-358.0,-358.6,-360.9,-362.8,-364.5,-365.7,-367.9,-366.7,-367.8,-368.9,-370.5,-368.9,-369.3,-372.6,-374.9,-376.1,-377.3,-375.6,-375.4,-378.1,-377.3,-376.7,-378.0,-380.4,-380.2,-378.3,-383.0,-385.1,-388.7,-391.0,-392.2,-394.6,-389.2,-388.6,-386.3,-387.7,-387.3,-388.0,-390.9,-392.0,-393.3,-394.5,-394.0,-394.8,-394.5,-395.7,-387.6,-389.8,-390.9,-390.2,-391.4,-390.6,-393.0,-394.2,-395.4,-395.3,-396.5,-397.4,-397.4,-399.9,-402.2,-403.4,-406.2,-406.9,-409.9,-405.7,-406.0,-401.6,-402.9,-402.8,-403.8,-405.0,-406.0,-408.5,-407.1,-403.1,-403.6,-403.3,-401.5,-400.6,-401.8,-402.2,-403.7,-401.8,-405.4,-404.4,-402.4,-400.0,-396.6,-397.8,-399.8,-401.3,-399.2,-398.8,-395.4,-396.6,-396.3,-394.2,-397.8,-401.2,-402.4,-401.3,-402.4,-404.6,-405.9,-408.4,-409.6,-410.6,-406.1,-409.6,-412.9,-414.0,-415.6,-419.0,-422.4,-421.7,-426.0,-429.2,-430.3,-431.4,-433.5,-434.4,-436.6,-436.4,-438.6,-437.6,-436.0,-439.4,-440.5,-441.2,-438.6,-437.2,-439.5,-441.8,-441.3,-437.7,-438.8,-436.0,-437.1,-430.6,-431.7,-436.1,-437.2,-438.2,-439.0,-437.8,-432.4,-433.4,-435.0,-437.2,-433.8,-436.3,-433.3,-432.6,-431.8,-431.4,-432.6,-433.7,-433.3,-435.5,-436.6,-438.8,-435.5,-437.6,-436.1,-438.3,-435.7,-435.4,-438.9,-434.1,-433.1,-433.5,-431.0,-433.1,-432.3,-433.4,-431.7,-428.0,-430.2,-432.5,-434.8,-430.3,-433.8,-432.2,-434.4,-436.5,-439.7,-440.7,-437.4,-436.3,-434.5,-435.7,-432.3,-434.5,-436.8,-439.0,-440.2,-438.9,-442.4,-441.5,-445.0,-442.5,-441.7,-444.0,-445.3,-446.4,-445.1,-447.4,-446.9,-448.0,-450.2,-446.3,-448.4,-451.5,-450.6,-448.3,-448.8,-449.2,-450.2,-445.4,-442.3,-445.5,-444.0,-446.1]}},"gate":{"gates":[0.0,1.0,1.1,1.2],"Nasdaq-100":[-0.04,0.23,0.58,0.6],"S&P 500":[0.14,0.27,0.42,0.62]}};
+  const NS = "http://www.w3.org/2000/svg";
+  const MINUS = "−";
+  const DAY = 86400000;
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const parse = (s) => Date.parse(s + "T00:00:00Z");
+  const fmtDate = (t) => { const d = new Date(t); return MONTHS[d.getUTCMonth()] + " " + d.getUTCFullYear(); };
+
+  function mk(tag, attrs, parent) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function txt(parent, x, y, s, cls, anchor) {
+    const t = mk("text", { x: x, y: y, class: cls, "text-anchor": anchor || "start" }, parent);
+    t.textContent = s;
+    return t;
+  }
+  function fmtR(v, digits) {
+    const d = digits || 0;
+    const s = Math.abs(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+    if (Math.abs(v) < Math.pow(10, -d) / 2) return "0R";
+    return (v > 0 ? "+" : MINUS) + s + "R";
+  }
+  function niceTicks(lo, hi, n) {
+    const span = (hi - lo) || 1;
+    const raw = span / n;
+    const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const norm = raw / mag;
+    const step = (norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10) * mag;
+    const out = [];
+    for (let v = Math.floor(lo / step) * step; v <= Math.ceil(hi / step) * step + step / 2; v += step) {
+      out.push(Math.round(v / step) * step);
+    }
+    return { ticks: out, step: step };
+  }
+  function lastIdx(ts, t) {
+    let lo = 0, hi = ts.length - 1, ans = -1;
+    while (lo <= hi) { const mid = (lo + hi) >> 1; if (ts[mid] <= t) { ans = mid; lo = mid + 1; } else hi = mid - 1; }
+    return ans;
+  }
+  function observe(el, fn) {
+    let lastW = -1;
+    const run = () => { const w = Math.round(el.clientWidth); if (w !== lastW && w > 0) { lastW = w; fn(w); } };
+    if ("ResizeObserver" in window) new ResizeObserver(() => requestAnimationFrame(run)).observe(el);
+    else window.addEventListener("resize", run);
+    run();
+  }
+
+  const T0 = parse("2005-01-01"), T1 = parse("2020-06-01"), TB = parse("2015-01-01");
+
+  function lineChart(id, series, aria) {
+    const host = document.getElementById(id);
+    const plot = host.querySelector(".plot");
+    const tip = host.querySelector(".tip");
+    const S = series.map((s) => Object.assign({}, s, { t: s.d.map(parse) }));
+    let st = null;
+    let cur = T1 - DAY;
+
+    function draw(W) {
+      W = Math.max(300, W);
+      const H = Math.round(Math.max(240, Math.min(360, W * 0.48)));
+      const wide = W >= 560;
+      const m = { l: 60, r: wide ? 132 : 14, t: 30, b: 30 };
+      let lo = 0, hi = 0;
+      S.forEach((s) => s.v.forEach((v) => { if (v < lo) lo = v; if (v > hi) hi = v; }));
+      const nt = niceTicks(lo, hi, 5);
+      const y0 = nt.ticks[0], y1 = nt.ticks[nt.ticks.length - 1];
+      const X = (t) => m.l + (t - T0) / (T1 - T0) * (W - m.l - m.r);
+      const Y = (v) => m.t + (y1 - v) / (y1 - y0) * (H - m.t - m.b);
+      plot.textContent = "";
+      tip.hidden = true;
+      const svg = mk("svg", { width: W, height: H, viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": aria }, plot);
+      mk("rect", { x: X(TB), y: m.t, width: X(T1) - X(TB), height: H - m.t - m.b, class: "band" }, svg);
+      nt.ticks.forEach((v) => {
+        mk("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), class: v === 0 ? "zero" : "grid" }, svg);
+        txt(svg, m.l - 8, Y(v) + 4, v === 0 ? "0" : fmtR(v), "tick", "end");
+      });
+      const step = wide ? 2 : 4;
+      for (let yr = 2006; yr <= 2020; yr += step) txt(svg, X(parse(yr + "-01-01")), H - m.b + 18, String(yr), "tick", "middle");
+      txt(svg, X(TB) - 6, m.t - 10, "development", "bandlabel", "end");
+      txt(svg, X(TB) + 6, m.t - 10, "holdout", "bandlabel", "start");
+      S.forEach((s) => {
+        const d = s.t.map((t, i) => (i ? "L" : "M") + X(t).toFixed(1) + "," + Y(s.v[i]).toFixed(1)).join("");
+        mk("path", { d: d, class: "line", style: "stroke: var(" + s.color + ")" }, svg);
+      });
+      S.forEach((s) => {
+        const n = s.t.length - 1;
+        mk("circle", { cx: X(s.t[n]), cy: Y(s.v[n]), r: 4, class: "enddot", style: "fill: var(" + s.color + ")" }, svg);
+        if (wide) txt(svg, X(s.t[n]) + 10, Y(s.v[n]) + 4, s.short + " " + fmtR(s.v[n]), "endlabel", "start");
+      });
+      const cross = mk("line", { y1: m.t, y2: H - m.b, class: "cross", visibility: "hidden" }, svg);
+      const dots = S.map((s) => mk("circle", { r: 4, class: "hoverdot", style: "fill: var(" + s.color + ")", visibility: "hidden" }, svg));
+      mk("rect", { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, class: "hit" }, svg);
+      st = { W: W, m: m, X: X, Y: Y, cross: cross, dots: dots };
+    }
+    function show(t) {
+      if (!st) return;
+      t = Math.max(T0, Math.min(T1 - DAY, t));
+      cur = t;
+      const x = st.X(t);
+      st.cross.setAttribute("x1", x); st.cross.setAttribute("x2", x); st.cross.setAttribute("visibility", "visible");
+      let rows = "";
+      S.forEach((s, k) => {
+        const i = lastIdx(s.t, t);
+        const v = i >= 0 ? s.v[i] : 0;
+        st.dots[k].setAttribute("cx", x); st.dots[k].setAttribute("cy", st.Y(v)); st.dots[k].setAttribute("visibility", "visible");
+        rows += '<div class="tiprow"><span class="key" style="background: var(' + s.color + ')"></span><span>' + s.name +
+          "</span><b>" + fmtR(v, 1) + "</b></div>";
+      });
+      tip.innerHTML = '<div class="tipdate">' + fmtDate(t) + (t >= TB ? " · holdout" : " · development") + "</div>" + rows;
+      tip.hidden = false;
+      const tw = tip.offsetWidth;
+      let left = x + 14;
+      if (left + tw > st.W - 4) left = x - tw - 14;
+      tip.style.left = Math.max(4, left) + "px";
+      tip.style.top = (st.m.t + 6) + "px";
+    }
+    function hide() {
+      if (!st) return;
+      st.cross.setAttribute("visibility", "hidden");
+      st.dots.forEach((d) => d.setAttribute("visibility", "hidden"));
+      tip.hidden = true;
+    }
+    plot.addEventListener("pointermove", (e) => {
+      if (!st) return;
+      const r = plot.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      if (x < st.m.l || x > st.W - st.m.r) { hide(); return; }
+      show(T0 + (x - st.m.l) / (st.W - st.m.l - st.m.r) * (T1 - T0));
+    });
+    plot.addEventListener("pointerleave", hide);
+    plot.addEventListener("focus", () => show(cur));
+    plot.addEventListener("blur", hide);
+    plot.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); show(cur + (e.key === "ArrowLeft" ? -30 : 30) * DAY); }
+      else if (e.key === "Escape") hide();
+    });
+    observe(plot, draw);
+
+    // table view: year-end cumulative R per series
+    const table = document.getElementById(host.dataset.table || "");
+    if (table) {
+      let html = "<thead><tr><th>Year end</th>" + S.map((s) => '<th class="num">' + s.name + "</th>").join("") + "</tr></thead><tbody>";
+      for (let yr = 2005; yr <= 2020; yr++) {
+        const t = yr === 2020 ? T1 : parse(yr + "-12-31");
+        html += "<tr><td>" + (yr === 2020 ? "May 2020" : yr) + "</td>" + S.map((s) => {
+          const i = lastIdx(s.t, t);
+          return '<td class="num">' + (i >= 0 ? fmtR(s.v[i], 1) : "0R") + "</td>";
+        }).join("") + "</tr>";
+      }
+      table.innerHTML = html + "</tbody>";
+    }
+  }
+
+  function colPath(x, w, yb, yv, r) {
+    const h = Math.abs(yb - yv);
+    r = Math.min(r, h, w / 2);
+    if (yv <= yb) return "M" + x + "," + yb + "V" + (yv + r) + "Q" + x + "," + yv + " " + (x + r) + "," + yv + "H" + (x + w - r) + "Q" + (x + w) + "," + yv + " " + (x + w) + "," + (yv + r) + "V" + yb + "Z";
+    return "M" + x + "," + yb + "V" + (yv - r) + "Q" + x + "," + yv + " " + (x + r) + "," + yv + "H" + (x + w - r) + "Q" + (x + w) + "," + yv + " " + (x + w) + "," + (yv - r) + "V" + yb + "Z";
+  }
+
+  function gateChart() {
+    const host = document.getElementById("c-gate");
+    const plot = host.querySelector(".plot");
+    const tip = host.querySelector(".tip");
+    const g = DATA.gate;
+    const cats = [["no gate", ""], ["≥ 1.0", ""], ["≥ 1.1", "frozen"], ["≥ 1.2", ""]];
+    const series = [{ name: "Nasdaq-100", color: "--s1", v: g["Nasdaq-100"] }, { name: "S&P 500", color: "--s2", v: g["S&P 500"] }];
+    function draw(W) {
+      W = Math.max(300, W);
+      const H = 280;
+      const m = { l: 60, r: 12, t: 24, b: 44 };
+      let lo = 0, hi = 0;
+      series.forEach((s) => s.v.forEach((v) => { lo = Math.min(lo, v); hi = Math.max(hi, v); }));
+      const nt = niceTicks(lo, hi, 4);
+      const y0 = nt.ticks[0], y1 = nt.ticks[nt.ticks.length - 1];
+      const Y = (v) => m.t + (y1 - v) / (y1 - y0) * (H - m.t - m.b);
+      plot.textContent = "";
+      tip.hidden = true;
+      const svg = mk("svg", { width: W, height: H, viewBox: "0 0 " + W + " " + H, role: "img",
+        "aria-label": "Expectancy per trade by gate setting, 2005 to 2014. Nasdaq-100: -0.04, 0.23, 0.58, 0.60. S&P 500: 0.14, 0.27, 0.42, 0.62." }, plot);
+      nt.ticks.forEach((v) => {
+        mk("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), class: v === 0 ? "zero" : "grid" }, svg);
+        txt(svg, m.l - 8, Y(v) + 4, v === 0 ? "0" : fmtR(v, 1), "tick", "end");
+      });
+      const band = (W - m.l - m.r) / cats.length;
+      const bw = Math.min(24, band * 0.3);
+      const gap = 4;
+      const labels = band >= 96;
+      const labelled = [0, 2];   // label the ungated baseline and the frozen setting; the rest live in tooltips and the table
+      cats.forEach((c, i) => {
+        const cx = m.l + band * (i + 0.5);
+        txt(svg, cx, H - m.b + 18, c[0], "tick", "middle");
+        if (c[1]) txt(svg, cx, H - m.b + 32, c[1], "sublabel", "middle");
+        series.forEach((s, k) => {
+          const x = cx - (bw + gap / 2) + k * (bw + gap);
+          const v = s.v[i];
+          const p = mk("path", { d: colPath(x, bw, Y(0), Y(v), 4), class: "bar", tabindex: "0",
+            style: "fill: var(" + s.color + ")", "aria-label": s.name + ", gate " + c[0] + ": " + fmtR(v, 2) }, svg);
+          if (labels && labelled.includes(i)) txt(svg, x + bw / 2, v >= 0 ? Y(v) - 6 : Y(v) + 14, fmtR(v, 2), "barlabel", "middle");
+          const showTip = () => {
+            tip.innerHTML = '<div class="tipdate">Gate ' + c[0] + (c[1] ? " · " + c[1] : "") + '</div><div class="tiprow"><span class="key" style="background: var(' +
+              s.color + ')"></span><span>' + s.name + "</span><b>" + fmtR(v, 2) + "</b></div>";
+            tip.hidden = false;
+            const tw = tip.offsetWidth;
+            let left = x + bw + 8;
+            if (left + tw > W - 4) left = x - tw - 8;
+            tip.style.left = Math.max(4, left) + "px";
+            tip.style.top = Math.max(4, Math.min(Y(v), Y(0)) - 10) + "px";
+          };
+          p.addEventListener("pointerenter", showTip);
+          p.addEventListener("focus", showTip);
+          p.addEventListener("pointerleave", () => { tip.hidden = true; });
+          p.addEventListener("blur", () => { tip.hidden = true; });
+        });
+      });
+      mk("line", { x1: m.l, x2: W - m.r, y1: Y(0), y2: Y(0), class: "zero" }, svg);
+    }
+    observe(plot, draw);
+    let html = '<thead><tr><th>Gate (ATR14 / ATR100)</th><th class="num">Nasdaq-100</th><th class="num">S&amp;P 500</th></tr></thead><tbody>';
+    cats.forEach((c, i) => {
+      html += "<tr><td>" + c[0] + (c[1] ? " (" + c[1] + ")" : "") + '</td><td class="num">' + fmtR(series[0].v[i], 2) +
+        '</td><td class="num">' + fmtR(series[1].v[i], 2) + "</td></tr>";
+    });
+    document.getElementById("t-gate").innerHTML = html + "</tbody>";
+  }
+
+  document.getElementById("c-ebm").dataset.table = "t-ebm";
+  document.getElementById("c-text").dataset.table = "t-text";
+  lineChart("c-ebm", [
+    { name: "Nasdaq-100", short: "Nasdaq-100", color: "--s1", d: DATA.ebm.nq.d, v: DATA.ebm.nq.v },
+    { name: "S&P 500", short: "S&P 500", color: "--s2", d: DATA.ebm.es.d, v: DATA.ebm.es.v }
+  ], "Cumulative R of the Expansion Breakaway Model, 2005 to May 2020. Nasdaq-100 ends at plus 63R; S&P 500 ends at plus 15R after losing 17R in the holdout.");
+  lineChart("c-text", [
+    { name: "ICT 2022 model", short: "2022 model", color: "--s3", d: DATA.textbook.ict.d, v: DATA.textbook.ict.v },
+    { name: "Silver Bullet", short: "Silver Bullet", color: "--s4", d: DATA.textbook.sb.d, v: DATA.textbook.sb.v }
+  ], "Cumulative R of mechanized textbook ICT setups on the Nasdaq-100, 2005 to May 2020. The 2022 model falls to about minus 1,030R and the Silver Bullet to about minus 450R.");
+  gateChart();
+})();
+</script>

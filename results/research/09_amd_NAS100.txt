@@ -1,0 +1,33 @@
+### NAS100_USD AMD once-a-day, exit 15:55, cost 1.0pt
+T=10:00 raid=1 vs_open=open buf=0.0 n= 819 win=33.5% E=-0.130 gross=+0.012 t=-2.23 risk=0.28ATR H1=-0.119 H2=-0.141 L=-0.165 S=-0.093
+T=10:00 raid=1 vs_open=open buf=0.1 n= 817 win=38.6% E=-0.116 gross=-0.023 t=-2.76 risk=0.38ATR H1=-0.117 H2=-0.114 L=-0.125 S=-0.105
+T=10:00 raid=1 vs_open=none buf=0.0 n=2712 win=20.0% E=-0.632 gross=-0.179 t=-14.30 risk=0.15ATR H1=-0.631 H2=-0.633 L=-0.592 S=-0.672
+T=10:00 raid=1 vs_open=none buf=0.1 n=2761 win=29.7% E=-0.226 gross=-0.075 t=-7.37 risk=0.25ATR H1=-0.246 H2=-0.208 L=-0.241 S=-0.211
+T=10:00 raid=0 vs_open=open buf=0.0 n=2426 win=33.5% E=-0.071 gross=+0.090 t=-1.85 risk=0.26ATR H1=-0.081 H2=-0.062 L=-0.043 S=-0.100
+T=10:00 raid=0 vs_open=open buf=0.1 n=2422 win=40.3% E=-0.045 gross=+0.053 t=-1.65 risk=0.36ATR H1=-0.034 H2=-0.055 L=-0.023 S=-0.067
+T=10:00 raid=0 vs_open=none buf=0.0 n=4872 win=23.3% E=-0.477 gross=-0.094 t=-14.58 risk=0.18ATR H1=-0.470 H2=-0.484 L=-0.424 S=-0.530
+T=10:00 raid=0 vs_open=none buf=0.1 n=4939 win=32.6% E=-0.167 gross=-0.029 t=-7.48 risk=0.28ATR H1=-0.177 H2=-0.158 L=-0.156 S=-0.178
+T=10:30 raid=1 vs_open=open buf=0.0 n=1055 win=39.6% E=-0.096 gross=+0.011 t=-2.47 risk=0.37ATR H1=-0.107 H2=-0.086 L=-0.103 S=-0.087
+T=10:30 raid=1 vs_open=open buf=0.1 n=1042 win=43.1% E=-0.065 gross=+0.012 t=-2.13 risk=0.46ATR H1=-0.088 H2=-0.043 L=-0.087 S=-0.039
+T=10:30 raid=1 vs_open=none buf=0.0 n=3176 win=26.4% E=-0.405 gross=-0.047 t=-9.19 risk=0.21ATR H1=-0.469 H2=-0.343 L=-0.320 S=-0.490
+T=10:30 raid=1 vs_open=none buf=0.1 n=3196 win=34.8% E=-0.155 gross=-0.025 t=-6.01 risk=0.30ATR H1=-0.181 H2=-0.129 L=-0.152 S=-0.158
+T=10:30 raid=0 vs_open=open buf=0.0 n=2415 win=38.8% E=-0.092 gross=+0.025 t=-3.23 risk=0.35ATR H1=-0.087 H2=-0.098 L=-0.070 S=-0.117
+T=10:30 raid=0 vs_open=open buf=0.1 n=2392 win=43.3% E=-0.056 gross=+0.023 t=-2.59 risk=0.45ATR H1=-0.063 H2=-0.050 L=-0.058 S=-0.054
+T=10:30 raid=0 vs_open=none buf=0.0 n=4882 win=29.1% E=-0.310 gross=+0.002 t=-8.83 risk=0.24ATR H1=-0.328 H2=-0.292 L=-0.221 S=-0.399
+T=10:30 raid=0 vs_open=none buf=0.1 n=4899 win=37.0% E=-0.112 gross=+0.007 t=-5.53 risk=0.33ATR H1=-0.124 H2=-0.101 L=-0.102 S=-0.122
+T=11:00 raid=1 vs_open=open buf=0.0 n=1142 win=39.6% E=-0.126 gross=-0.030 t=-3.95 risk=0.41ATR H1=-0.145 H2=-0.109 L=-0.124 S=-0.129
+T=11:00 raid=1 vs_open=open buf=0.1 n=1125 win=41.9% E=-0.099 gross=-0.028 t=-3.87 risk=0.50ATR H1=-0.119 H2=-0.080 L=-0.097 S=-0.101
+T=11:00 raid=1 vs_open=none buf=0.0 n=3339 win=29.8% E=-0.279 gross=+0.042 t=-6.03 risk=0.24ATR H1=-0.208 H2=-0.349 L=-0.240 S=-0.318
+T=11:00 raid=1 vs_open=none buf=0.1 n=3364 win=37.0% E=-0.124 gross=-0.002 t=-5.32 risk=0.33ATR H1=-0.127 H2=-0.121 L=-0.124 S=-0.124
+T=11:00 raid=0 vs_open=open buf=0.0 n=2404 win=39.7% E=-0.107 gross=-0.004 t=-4.41 risk=0.40ATR H1=-0.125 H2=-0.089 L=-0.076 S=-0.141
+T=11:00 raid=0 vs_open=open buf=0.1 n=2364 win=42.6% E=-0.085 gross=-0.012 t=-4.55 risk=0.49ATR H1=-0.096 H2=-0.074 L=-0.063 S=-0.110
+T=11:00 raid=0 vs_open=none buf=0.0 n=4848 win=32.0% E=-0.217 gross=+0.059 t=-5.72 risk=0.27ATR H1=-0.180 H2=-0.253 L=-0.196 S=-0.238
+T=11:00 raid=0 vs_open=none buf=0.1 n=4853 win=38.5% E=-0.109 gross=+0.003 t=-5.93 risk=0.36ATR H1=-0.106 H2=-0.112 L=-0.100 S=-0.119
+T=11:30 raid=1 vs_open=open buf=0.0 n=1189 win=40.7% E=-0.106 gross=-0.016 t=-3.80 risk=0.43ATR H1=-0.139 H2=-0.075 L=-0.103 S=-0.110
+T=11:30 raid=1 vs_open=open buf=0.1 n=1165 win=42.3% E=-0.083 gross=-0.015 t=-3.56 risk=0.52ATR H1=-0.113 H2=-0.055 L=-0.091 S=-0.073
+T=11:30 raid=1 vs_open=none buf=0.0 n=3419 win=31.2% E=-0.311 gross=-0.006 t=-8.30 risk=0.25ATR H1=-0.272 H2=-0.351 L=-0.301 S=-0.321
+T=11:30 raid=1 vs_open=none buf=0.1 n=3424 win=37.9% E=-0.130 gross=-0.013 t=-6.14 risk=0.35ATR H1=-0.145 H2=-0.114 L=-0.138 S=-0.121
+T=11:30 raid=0 vs_open=open buf=0.0 n=2361 win=41.9% E=-0.085 gross=+0.009 t=-3.97 risk=0.42ATR H1=-0.100 H2=-0.070 L=-0.078 S=-0.093
+T=11:30 raid=0 vs_open=open buf=0.1 n=2312 win=44.1% E=-0.070 gross=-0.001 t=-4.09 risk=0.51ATR H1=-0.084 H2=-0.057 L=-0.070 S=-0.070
+T=11:30 raid=0 vs_open=none buf=0.0 n=4822 win=33.6% E=-0.267 gross=-0.003 t=-9.22 risk=0.29ATR H1=-0.240 H2=-0.295 L=-0.246 S=-0.289
+T=11:30 raid=0 vs_open=none buf=0.1 n=4808 win=39.6% E=-0.115 gross=-0.007 t=-6.79 risk=0.38ATR H1=-0.127 H2=-0.103 L=-0.112 S=-0.117

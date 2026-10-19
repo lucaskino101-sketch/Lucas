@@ -1,0 +1,564 @@
+<title>Expansion Breakaway Model</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one-column research note (860px measure). Verdict tiles, the setup, when it trades, results, what failed, caveats, forward test. */
+:root {
+  --bg: #f1f2f4;
+  --panel: #fcfcfb;
+  --fg: #0f1216;
+  --fg2: #4a505a;
+  --muted: #747a84;
+  --rule: #e0e2e7;
+  --axis: #c3c6cc;
+  --mark-neutral: #b4b9c2;
+  --accent: #2a78d6;
+  --accent-wash: rgba(42, 120, 214, 0.11);
+  --band: rgba(42, 120, 214, 0.06);
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --s4: #eda100;
+  --good: #0ca30c;
+  --critical: #d03b3b;
+  --code-bg: #e8eaee;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e0f11; --panel: #1a1a19; --fg: #eef0f2; --fg2: #c3c7ce; --muted: #8d929b; --rule: #2c2d30;
+    --axis: #404247; --mark-neutral: #5a5f68; --accent: #3987e5; --accent-wash: rgba(57, 135, 229, 0.18);
+    --band: rgba(57, 135, 229, 0.09); --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    --code-bg: #24262a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e0f11; --panel: #1a1a19; --fg: #eef0f2; --fg2: #c3c7ce; --muted: #8d929b; --rule: #2c2d30;
+  --axis: #404247; --mark-neutral: #5a5f68; --accent: #3987e5; --accent-wash: rgba(57, 135, 229, 0.18);
+  --band: rgba(57, 135, 229, 0.09); --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+  --code-bg: #24262a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
+.page {
+  max-width: 860px; margin: 0 auto; padding-block: 40px 72px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 56px;
+}
+header { display: grid; gap: 14px; }
+.eyebrow { font-family: var(--font-data); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-size: clamp(32px, 6vw, 46px); line-height: 1.08; font-weight: 700; letter-spacing: -0.015em; margin: 0; text-wrap: balance; }
+h2 { font-size: 24px; line-height: 1.25; font-weight: 600; margin: 0; text-wrap: balance; }
+h3 { font-size: 16px; line-height: 1.35; font-weight: 600; margin: 0; }
+p { margin: 0; max-width: 66ch; }
+.dek { font-size: 18px; color: var(--fg2); }
+section { display: grid; gap: 20px; min-width: 0; }
+.lead { color: var(--fg2); }
+.mono, code { font-family: var(--font-data); font-size: 0.9em; }
+code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+a { color: var(--accent); }
+a:focus-visible, [tabindex]:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+/* verdict + tiles */
+.verdict { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 18px 20px; display: grid; gap: 6px; }
+.verdict h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; }
+.tile { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; display: grid; gap: 4px; align-content: start; min-width: 0; }
+.tile .label { font-size: 13px; color: var(--fg2); }
+.tile .value { font-size: 34px; line-height: 1.15; font-weight: 600; letter-spacing: -0.01em; }
+.tile .sub { font-size: 13px; color: var(--muted); }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--fg); margin-top: 6px; }
+.chip svg { width: 14px; height: 14px; flex: none; }
+.chip .good { color: var(--good); }
+.chip .bad { color: var(--critical); }
+
+/* rules */
+ol.rules { margin: 0; padding: 0; list-style: none; counter-reset: r; display: grid; gap: 0; border-top: 1px solid var(--rule); }
+ol.rules li { counter-increment: r; display: grid; grid-template-columns: 34px 132px 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+ol.rules li::before { content: counter(r); font-family: var(--font-data); font-size: 13px; color: var(--muted); }
+ol.rules .k { font-weight: 600; }
+ol.rules .v { color: var(--fg2); min-width: 0; }
+@media (max-width: 560px) { ol.rules li { grid-template-columns: 28px 1fr; } ol.rules .v { grid-column: 2; } }
+
+/* figures */
+figure { margin: 0; display: grid; gap: 10px; min-width: 0; }
+figcaption { font-size: 14px; color: var(--muted); max-width: 70ch; }
+.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 18px; min-width: 0; }
+.scroll { overflow-x: auto; }
+.scroll svg { display: block; width: 100%; min-width: 640px; height: auto; }
+.scroll svg.tl-narrow { display: none; min-width: 0; }
+@media (max-width: 600px) { .scroll svg.tl-wide { display: none; } .scroll svg.tl-narrow { display: block; } }
+.d-fvg { fill: var(--accent-wash); }
+.d-level { stroke: var(--fg2); stroke-width: 1.5; }
+.d-ce { stroke: var(--accent); stroke-width: 2; }
+.d-wick { stroke: var(--fg); stroke-width: 1.2; }
+.d-up { fill: var(--panel); stroke: var(--fg); stroke-width: 1.2; }
+.d-down { fill: var(--fg); stroke: var(--fg); stroke-width: 1.2; }
+.d-dot { fill: var(--accent); stroke: var(--panel); stroke-width: 2; }
+.d-leader { stroke: var(--muted); stroke-width: 1; }
+.d-label { fill: var(--fg2); font-size: 12px; font-family: var(--font-body); }
+.d-strong { fill: var(--fg); font-weight: 600; }
+.d-muted { fill: var(--muted); }
+.d-bracket { fill: none; stroke: var(--muted); stroke-width: 1; }
+.d-axis { stroke: var(--axis); stroke-width: 1; }
+.d-tick { fill: var(--muted); font-size: 11px; font-family: var(--font-data); }
+.d-map { fill: var(--mark-neutral); }
+.d-act { fill: var(--accent); }
+.d-wash { fill: var(--accent-wash); stroke: var(--accent); stroke-width: 1; }
+.d-snap { stroke: var(--fg); stroke-width: 1; }
+
+/* charts */
+.chart-head { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; justify-content: space-between; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--fg2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; }
+.legend i.sq { width: 10px; height: 10px; border-radius: 2px; }
+.plotwrap { position: relative; }
+.plot { width: 100%; min-height: 240px; touch-action: pan-y; }
+.plot svg { display: block; }
+.plot .grid { stroke: var(--rule); stroke-width: 1; }
+.plot .zero { stroke: var(--axis); stroke-width: 1; }
+.plot .band { fill: var(--band); }
+.plot .tick { fill: var(--muted); font-size: 11px; font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+.plot .bandlabel { fill: var(--muted); font-size: 11px; font-family: var(--font-body); }
+.plot .endlabel { fill: var(--fg2); font-size: 12px; font-family: var(--font-body); }
+.plot .barlabel { fill: var(--fg2); font-size: 11px; font-family: var(--font-data); }
+.plot .sublabel { fill: var(--muted); font-size: 10px; font-family: var(--font-body); }
+.plot .line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.plot .enddot, .plot .hoverdot { stroke: var(--panel); stroke-width: 2; }
+.plot .cross { stroke: var(--fg2); stroke-width: 1; }
+.plot .hit { fill: transparent; }
+.plot .bar:focus { outline: none; }
+.plot .bar:focus-visible { stroke: var(--fg); stroke-width: 2; }
+.tip { position: absolute; pointer-events: none; background: var(--panel); color: var(--fg); border: 1px solid var(--rule);
+  border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12); min-width: 170px; z-index: 2; }
+.tipdate { color: var(--muted); margin-bottom: 4px; font-family: var(--font-data); }
+.tiprow { display: grid; grid-template-columns: 10px 1fr auto; gap: 8px; align-items: center; }
+.tiprow .key { width: 10px; height: 3px; border-radius: 2px; }
+.tiprow b { font-family: var(--font-data); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+/* tables */
+details { font-size: 14px; }
+summary { cursor: pointer; color: var(--fg2); width: fit-content; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-weight: 600; color: var(--fg2); font-size: 13px; }
+td.num, th.num { text-align: right; font-family: var(--font-data); font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.hl td { font-weight: 600; }
+.neg { color: var(--fg); }
+ul.plain { margin: 0; padding-left: 20px; display: grid; gap: 10px; max-width: 70ch; }
+ul.plain li::marker { color: var(--muted); }
+ol.steps { margin: 0; padding-left: 22px; display: grid; gap: 10px; max-width: 70ch; }
+footer { border-top: 1px solid var(--rule); padding-top: 18px; font-size: 13px; color: var(--muted); display: grid; gap: 8px; }
+footer p { max-width: 80ch; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="page">
+  <header>
+    <div class="eyebrow">ICT research · Nasdaq-100 futures · 1&#8209;minute data 2005–2020</div>
+    <h1>Expansion Breakaway Model</h1>
+    <p class="dek">An Inner Circle Trader setup with one rule added: trade the breakaway fair value gap only when daily volatility is expanding. Built on 2005–2014 data, frozen, then run once on 2015–2020.</p>
+  </header>
+
+  <section aria-labelledby="h-stand">
+    <div class="verdict">
+      <h3 id="h-stand">Where it stands</h3>
+      <p>The model made money on the Nasdaq-100 holdout and lost it on the S&amp;P 500, EUR/USD, GBP/USD and gold. The Nasdaq profit rests on about three trend days and the t-stat is about 1. Treat it as a lead to forward-test, not a proven edge. The mechanized textbook ICT setups lost money everywhere.</p>
+    </div>
+    <div class="tiles">
+      <div class="tile">
+        <div class="label">Nasdaq-100 holdout</div>
+        <div class="value">+0.31R</div>
+        <div class="sub">per trade over 58 trades, after 1-point costs</div>
+        <span class="chip"><svg class="good" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Held up out of sample</span>
+      </div>
+      <div class="tile">
+        <div class="label">Profit factor, Nasdaq-100 holdout</div>
+        <div class="value">1.45</div>
+        <div class="sub">max drawdown −7.3% at 1% risk per trade</div>
+      </div>
+      <div class="tile">
+        <div class="label">S&amp;P 500 holdout, same rules</div>
+        <div class="value">−0.35R</div>
+        <div class="sub">per trade over 47 trades</div>
+        <span class="chip"><svg class="bad" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Failed out of sample</span>
+      </div>
+      <div class="tile">
+        <div class="label">Textbook ICT 2022 model</div>
+        <div class="value">−0.27R</div>
+        <div class="sub">per trade over 1,084 Nasdaq-100 holdout trades</div>
+        <span class="chip"><svg class="bad" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Lost in every period</span>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-setup">
+    <h2 id="h-setup">The setup</h2>
+    <figure>
+      <div class="panel scroll">__SETUP_SVG__</div>
+      <figcaption>An illustrated long on 15-minute candles. Price runs a buy-side level, a candle closes above it, and the leg leaves a bullish fair value gap. The limit sits at the gap's midpoint with the stop at the level. Days like this one pay for the rest: 64% of holdout trades hit the stop.</figcaption>
+    </figure>
+    <ol class="rules">
+      <li><span class="k">Regime gate</span><span class="v">The 14-day average daily range is at least 1.10 × the 100-day average. Otherwise no trade today.</span></li>
+      <li><span class="k">Liquidity map</span><span class="v">At <span class="mono">09:30</span>: the overnight, previous-day, pre-market, Asia, London and previous cash-session highs above the open, within 1.5 ATR of it.</span></li>
+      <li><span class="k">Run</span><span class="v">Between <span class="mono">09:30</span> and <span class="mono">11:30</span>, price trades through one or more of those levels.</span></li>
+      <li><span class="k">Breakaway</span><span class="v">A 15-minute candle closes above the highest level that was run, and the breakout leg contains a bullish 15-minute FVG.</span></li>
+      <li><span class="k">Entry</span><span class="v">Limit buy at the FVG's midpoint (consequent encroachment), live until <span class="mono">12:00</span>. Cancel it if a 15-minute candle closes back below the level.</span></li>
+      <li><span class="k">Stop</span><span class="v">At the run level. Skip the trade if that's closer than max(0.05 ATR, 2 NQ points) or wider than 0.6 ATR.</span></li>
+      <li><span class="k">Exit</span><span class="v">At <span class="mono">15:55</span> New York, or at the stop. One trade per day. Shorts are the mirror image.</span></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="h-when">
+    <h2 id="h-when">When it trades</h2>
+    <p class="lead">The gate was open on 29% of days in 2005–2014 and 37% in 2015–2020, and a setup forms on only some of those, so the model averages about 11 trades a year. Everything else in the day exists to build the liquidity map it reads at the open.</p>
+    <figure>
+      <div class="panel scroll">__TIMELINE_SVG__</div>
+      <figcaption>One Globex day in New York time. Grey rows set the liquidity levels; blue rows are when the model acts. Previous-day levels come from the session before.</figcaption>
+    </figure>
+  </section>
+
+  <section aria-labelledby="h-results">
+    <h2 id="h-results">Results</h2>
+    <figure class="panel" id="c-ebm">
+      <div class="chart-head">
+        <h3>Cumulative R, conservative costs</h3>
+        <div class="legend"><span><i style="background: var(--s1)"></i>Nasdaq-100</span><span><i style="background: var(--s2)"></i>S&amp;P 500</span></div>
+      </div>
+      <div class="plotwrap"><div class="plot" tabindex="0" aria-label="Cumulative R chart. Use the arrow keys to move through time."></div><div class="tip" hidden></div></div>
+      <figcaption>The shaded span is the 2015–2020 holdout, run once after the rules were frozen. Costs are 1.0 point (NQ) and 0.5 point (ES) per round trip. Without its three best holdout trades the Nasdaq line would end the holdout lower than it started.</figcaption>
+      <details><summary>Table view</summary><div class="tablewrap"><table id="t-ebm"></table></div></details>
+    </figure>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Market</th><th>Period</th><th class="num">Trades</th><th class="num">Win %</th><th class="num">Expectancy</th><th class="num">t</th><th class="num">Profit factor</th><th class="num">Max DD at 1%</th></tr></thead>
+        <tbody>
+          <tr><td>Nasdaq-100</td><td>2005–2014</td><td class="num">78</td><td class="num">33</td><td class="num">+0.58R</td><td class="num">1.6</td><td class="num">1.75</td><td class="num">−12.2%</td></tr>
+          <tr class="hl"><td>Nasdaq-100</td><td>Holdout 2015–2020</td><td class="num">58</td><td class="num">36</td><td class="num">+0.31R</td><td class="num">1.0</td><td class="num">1.45</td><td class="num">−7.3%</td></tr>
+          <tr><td>S&amp;P 500</td><td>2005–2014</td><td class="num">74</td><td class="num">39</td><td class="num">+0.42R</td><td class="num">1.4</td><td class="num">1.58</td><td class="num">−15.6%</td></tr>
+          <tr class="hl"><td>S&amp;P 500</td><td>Holdout 2015–2020</td><td class="num">47</td><td class="num">19</td><td class="num">−0.35R</td><td class="num">−1.1</td><td class="num">0.60</td><td class="num">−18.3%</td></tr>
+          <tr><td>EUR/USD · GBP/USD · gold</td><td>2005–2020</td><td class="num">12–48</td><td class="num">8–41</td><td class="num">all negative</td><td class="num">—</td><td class="num">0.27–0.91</td><td class="num">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure class="panel" id="c-gate">
+      <div class="chart-head">
+        <h3>Why the gate exists</h3>
+        <div class="legend"><span><i class="sq" style="background: var(--s1)"></i>Nasdaq-100</span><span><i class="sq" style="background: var(--s2)"></i>S&amp;P 500</span></div>
+      </div>
+      <div class="plotwrap"><div class="plot"></div><div class="tip" hidden></div></div>
+      <figcaption>Expectancy per trade in 2005–2014 for the same breakaway rules at different gate settings, after conservative costs. Ungated, the pattern is roughly break-even. The frozen setting, 1.10, sits in the middle of the range where every exit variant was positive on both indices.</figcaption>
+      <details><summary>Table view</summary><div class="tablewrap"><table id="t-gate"></table></div></details>
+    </figure>
+  </section>
+
+  <section aria-labelledby="h-failed">
+    <h2 id="h-failed">What did not work</h2>
+    <p class="lead">Each concept was turned into exact rules and tested on 2005–2014 data before anything touched the holdout. Roughly 1,000 rule and parameter combinations were tried across five markets.</p>
+    <figure class="panel" id="c-text">
+      <div class="chart-head">
+        <h3>Textbook ICT setups, Nasdaq-100, cumulative R</h3>
+        <div class="legend"><span><i style="background: var(--s3)"></i>ICT 2022 model</span><span><i style="background: var(--s4)"></i>Silver Bullet</span></div>
+      </div>
+      <div class="plotwrap"><div class="plot" tabindex="0" aria-label="Cumulative R of the textbook ICT setups. Use the arrow keys to move through time."></div><div class="tip" hidden></div></div>
+      <figcaption>Liquidity sweep, 1-minute structure shift, FVG entry at the midpoint, 2R target (the 2022 model), and the 10:00–11:00 Silver Bullet with a liquidity target. Both lose steadily in development and in the holdout. A 1-minute FVG stop is only a few points wide, so ordinary costs eat a large share of each trade while the edge before costs is about zero.</figcaption>
+      <details><summary>Table view</summary><div class="tablewrap"><table id="t-text"></table></div></details>
+    </figure>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>ICT concept, as rules</th><th>Result, 2005–2014</th><th>Verdict</th></tr></thead>
+        <tbody>
+          <tr><td>Daily bias: midnight open, previous close location, overnight move, gap, 20-day trend</td><td>Direction hit rate 43–53%</td><td>No signal</td></tr>
+          <tr><td>Liquidity sweep and reclaim of overnight, previous-day, Asia, London and pre-market levels</td><td>−0.11 to +0.19R before costs</td><td>No edge</td></tr>
+          <tr><td>Sweep → structure shift → FVG, IFVG or shift-close entry, 1–15 minute structure (144 variants)</td><td>All negative after costs; best −0.11R</td><td>No edge</td></tr>
+          <tr><td>Adding SMT divergence with ES, or requiring two or more levels swept</td><td>No improvement</td><td>No edge</td></tr>
+          <tr><td>The same reversal model in the London and NY killzones on EUR/USD, GBP/USD and gold</td><td>Mostly negative; best +0.08R, t = 1.0</td><td>No edge</td></tr>
+          <tr><td>Daily power of three as one trade a day, held to the close</td><td>About zero before costs</td><td>No edge</td></tr>
+          <tr><td>Market-maker sequence: opposite side raided first, then the breakaway</td><td>Worse than without it</td><td>Not supported</td></tr>
+          <tr><td>London-open Judas swing</td><td>Negative; the London-open drift is real but smaller than costs</td><td>Not tradeable</td></tr>
+          <tr><td>Opening range gap with its midpoint as a magnet</td><td>Touch rates close to random-walk odds</td><td>No edge</td></tr>
+          <tr><td>Breakaway FVG continuation without a gate</td><td>Negative after costs</td><td>No edge</td></tr>
+          <tr><td><b>Breakaway FVG continuation in volatility expansion</b></td><td><b>Positive on both indices, in both halves</b></td><td><b>Frozen as EBM</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-caveats">
+    <h2 id="h-caveats">Before you trade it</h2>
+    <ul class="plain">
+      <li>The holdout edge isn't statistically significant. At 58 trades, +0.31R per trade is consistent with luck.</li>
+      <li>It's a trend-day catcher. About two in three trades lose, losing streaks run long, and a few days make each year.</li>
+      <li>It didn't transfer. The same rules lost on the S&amp;P 500 holdout and on FX and gold.</li>
+      <li>The data is Oanda's 1-minute mid price, a proxy for CME futures, and it ends in May 2020. Nothing here covers 2021–2026.</li>
+      <li>At 1% risk per trade, the Nasdaq holdout works out to roughly +3% a year with a 7% drawdown. That's a modest return.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="h-test">
+    <h2 id="h-test">Forward-test it</h2>
+    <ol class="steps">
+      <li>Add <code>pine/expansion_breakaway_model.pine</code> to a 1, 3 or 5-minute NQ or MNQ chart in TradingView. It's a Pine v6 strategy written to the same rules; it hasn't been compiled in TradingView yet, so small syntax fixes may be needed.</li>
+      <li>Check the regime panel at the open. When it reads CLOSED, the model has nothing to do today.</li>
+      <li>Paper-trade 30 to 50 signals before risking money, and size live trades at 0.5–1% risk.</li>
+      <li>To re-run the research, see <code>docs/RESEARCH.md</code>. <code>scripts/run_ebm.py</code> runs the frozen model on any period.</li>
+    </ol>
+  </section>
+
+  <footer>
+    <p>Data: Oanda one-minute mid prices, January 2005 to May 2020, from the public FutureSharks/financial-data repository. Fills are conservative: limit orders need a one-tick trade-through, and a bar that touches both stop and target counts as a stop. R is profit or loss divided by the planned stop distance, after costs.</p>
+    <p>Educational research, not financial advice.</p>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const DATA = __DATA__;
+  const NS = "http://www.w3.org/2000/svg";
+  const MINUS = "−";
+  const DAY = 86400000;
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const parse = (s) => Date.parse(s + "T00:00:00Z");
+  const fmtDate = (t) => { const d = new Date(t); return MONTHS[d.getUTCMonth()] + " " + d.getUTCFullYear(); };
+
+  function mk(tag, attrs, parent) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function txt(parent, x, y, s, cls, anchor) {
+    const t = mk("text", { x: x, y: y, class: cls, "text-anchor": anchor || "start" }, parent);
+    t.textContent = s;
+    return t;
+  }
+  function fmtR(v, digits) {
+    const d = digits || 0;
+    const s = Math.abs(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+    if (Math.abs(v) < Math.pow(10, -d) / 2) return "0R";
+    return (v > 0 ? "+" : MINUS) + s + "R";
+  }
+  function niceTicks(lo, hi, n) {
+    const span = (hi - lo) || 1;
+    const raw = span / n;
+    const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const norm = raw / mag;
+    const step = (norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10) * mag;
+    const out = [];
+    for (let v = Math.floor(lo / step) * step; v <= Math.ceil(hi / step) * step + step / 2; v += step) {
+      out.push(Math.round(v / step) * step);
+    }
+    return { ticks: out, step: step };
+  }
+  function lastIdx(ts, t) {
+    let lo = 0, hi = ts.length - 1, ans = -1;
+    while (lo <= hi) { const mid = (lo + hi) >> 1; if (ts[mid] <= t) { ans = mid; lo = mid + 1; } else hi = mid - 1; }
+    return ans;
+  }
+  function observe(el, fn) {
+    let lastW = -1;
+    const run = () => { const w = Math.round(el.clientWidth); if (w !== lastW && w > 0) { lastW = w; fn(w); } };
+    if ("ResizeObserver" in window) new ResizeObserver(() => requestAnimationFrame(run)).observe(el);
+    else window.addEventListener("resize", run);
+    run();
+  }
+
+  const T0 = parse("2005-01-01"), T1 = parse("2020-06-01"), TB = parse("2015-01-01");
+
+  function lineChart(id, series, aria) {
+    const host = document.getElementById(id);
+    const plot = host.querySelector(".plot");
+    const tip = host.querySelector(".tip");
+    const S = series.map((s) => Object.assign({}, s, { t: s.d.map(parse) }));
+    let st = null;
+    let cur = T1 - DAY;
+
+    function draw(W) {
+      W = Math.max(300, W);
+      const H = Math.round(Math.max(240, Math.min(360, W * 0.48)));
+      const wide = W >= 560;
+      const m = { l: 60, r: wide ? 132 : 14, t: 30, b: 30 };
+      let lo = 0, hi = 0;
+      S.forEach((s) => s.v.forEach((v) => { if (v < lo) lo = v; if (v > hi) hi = v; }));
+      const nt = niceTicks(lo, hi, 5);
+      const y0 = nt.ticks[0], y1 = nt.ticks[nt.ticks.length - 1];
+      const X = (t) => m.l + (t - T0) / (T1 - T0) * (W - m.l - m.r);
+      const Y = (v) => m.t + (y1 - v) / (y1 - y0) * (H - m.t - m.b);
+      plot.textContent = "";
+      tip.hidden = true;
+      const svg = mk("svg", { width: W, height: H, viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": aria }, plot);
+      mk("rect", { x: X(TB), y: m.t, width: X(T1) - X(TB), height: H - m.t - m.b, class: "band" }, svg);
+      nt.ticks.forEach((v) => {
+        mk("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), class: v === 0 ? "zero" : "grid" }, svg);
+        txt(svg, m.l - 8, Y(v) + 4, v === 0 ? "0" : fmtR(v), "tick", "end");
+      });
+      const step = wide ? 2 : 4;
+      for (let yr = 2006; yr <= 2020; yr += step) txt(svg, X(parse(yr + "-01-01")), H - m.b + 18, String(yr), "tick", "middle");
+      txt(svg, X(TB) - 6, m.t - 10, "development", "bandlabel", "end");
+      txt(svg, X(TB) + 6, m.t - 10, "holdout", "bandlabel", "start");
+      S.forEach((s) => {
+        const d = s.t.map((t, i) => (i ? "L" : "M") + X(t).toFixed(1) + "," + Y(s.v[i]).toFixed(1)).join("");
+        mk("path", { d: d, class: "line", style: "stroke: var(" + s.color + ")" }, svg);
+      });
+      S.forEach((s) => {
+        const n = s.t.length - 1;
+        mk("circle", { cx: X(s.t[n]), cy: Y(s.v[n]), r: 4, class: "enddot", style: "fill: var(" + s.color + ")" }, svg);
+        if (wide) txt(svg, X(s.t[n]) + 10, Y(s.v[n]) + 4, s.short + " " + fmtR(s.v[n]), "endlabel", "start");
+      });
+      const cross = mk("line", { y1: m.t, y2: H - m.b, class: "cross", visibility: "hidden" }, svg);
+      const dots = S.map((s) => mk("circle", { r: 4, class: "hoverdot", style: "fill: var(" + s.color + ")", visibility: "hidden" }, svg));
+      mk("rect", { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, class: "hit" }, svg);
+      st = { W: W, m: m, X: X, Y: Y, cross: cross, dots: dots };
+    }
+    function show(t) {
+      if (!st) return;
+      t = Math.max(T0, Math.min(T1 - DAY, t));
+      cur = t;
+      const x = st.X(t);
+      st.cross.setAttribute("x1", x); st.cross.setAttribute("x2", x); st.cross.setAttribute("visibility", "visible");
+      let rows = "";
+      S.forEach((s, k) => {
+        const i = lastIdx(s.t, t);
+        const v = i >= 0 ? s.v[i] : 0;
+        st.dots[k].setAttribute("cx", x); st.dots[k].setAttribute("cy", st.Y(v)); st.dots[k].setAttribute("visibility", "visible");
+        rows += '<div class="tiprow"><span class="key" style="background: var(' + s.color + ')"></span><span>' + s.name +
+          "</span><b>" + fmtR(v, 1) + "</b></div>";
+      });
+      tip.innerHTML = '<div class="tipdate">' + fmtDate(t) + (t >= TB ? " · holdout" : " · development") + "</div>" + rows;
+      tip.hidden = false;
+      const tw = tip.offsetWidth;
+      let left = x + 14;
+      if (left + tw > st.W - 4) left = x - tw - 14;
+      tip.style.left = Math.max(4, left) + "px";
+      tip.style.top = (st.m.t + 6) + "px";
+    }
+    function hide() {
+      if (!st) return;
+      st.cross.setAttribute("visibility", "hidden");
+      st.dots.forEach((d) => d.setAttribute("visibility", "hidden"));
+      tip.hidden = true;
+    }
+    plot.addEventListener("pointermove", (e) => {
+      if (!st) return;
+      const r = plot.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      if (x < st.m.l || x > st.W - st.m.r) { hide(); return; }
+      show(T0 + (x - st.m.l) / (st.W - st.m.l - st.m.r) * (T1 - T0));
+    });
+    plot.addEventListener("pointerleave", hide);
+    plot.addEventListener("focus", () => show(cur));
+    plot.addEventListener("blur", hide);
+    plot.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); show(cur + (e.key === "ArrowLeft" ? -30 : 30) * DAY); }
+      else if (e.key === "Escape") hide();
+    });
+    observe(plot, draw);
+
+    // table view: year-end cumulative R per series
+    const table = document.getElementById(host.dataset.table || "");
+    if (table) {
+      let html = "<thead><tr><th>Year end</th>" + S.map((s) => '<th class="num">' + s.name + "</th>").join("") + "</tr></thead><tbody>";
+      for (let yr = 2005; yr <= 2020; yr++) {
+        const t = yr === 2020 ? T1 : parse(yr + "-12-31");
+        html += "<tr><td>" + (yr === 2020 ? "May 2020" : yr) + "</td>" + S.map((s) => {
+          const i = lastIdx(s.t, t);
+          return '<td class="num">' + (i >= 0 ? fmtR(s.v[i], 1) : "0R") + "</td>";
+        }).join("") + "</tr>";
+      }
+      table.innerHTML = html + "</tbody>";
+    }
+  }
+
+  function colPath(x, w, yb, yv, r) {
+    const h = Math.abs(yb - yv);
+    r = Math.min(r, h, w / 2);
+    if (yv <= yb) return "M" + x + "," + yb + "V" + (yv + r) + "Q" + x + "," + yv + " " + (x + r) + "," + yv + "H" + (x + w - r) + "Q" + (x + w) + "," + yv + " " + (x + w) + "," + (yv + r) + "V" + yb + "Z";
+    return "M" + x + "," + yb + "V" + (yv - r) + "Q" + x + "," + yv + " " + (x + r) + "," + yv + "H" + (x + w - r) + "Q" + (x + w) + "," + yv + " " + (x + w) + "," + (yv - r) + "V" + yb + "Z";
+  }
+
+  function gateChart() {
+    const host = document.getElementById("c-gate");
+    const plot = host.querySelector(".plot");
+    const tip = host.querySelector(".tip");
+    const g = DATA.gate;
+    const cats = [["no gate", ""], ["≥ 1.0", ""], ["≥ 1.1", "frozen"], ["≥ 1.2", ""]];
+    const series = [{ name: "Nasdaq-100", color: "--s1", v: g["Nasdaq-100"] }, { name: "S&P 500", color: "--s2", v: g["S&P 500"] }];
+    function draw(W) {
+      W = Math.max(300, W);
+      const H = 280;
+      const m = { l: 60, r: 12, t: 24, b: 44 };
+      let lo = 0, hi = 0;
+      series.forEach((s) => s.v.forEach((v) => { lo = Math.min(lo, v); hi = Math.max(hi, v); }));
+      const nt = niceTicks(lo, hi, 4);
+      const y0 = nt.ticks[0], y1 = nt.ticks[nt.ticks.length - 1];
+      const Y = (v) => m.t + (y1 - v) / (y1 - y0) * (H - m.t - m.b);
+      plot.textContent = "";
+      tip.hidden = true;
+      const svg = mk("svg", { width: W, height: H, viewBox: "0 0 " + W + " " + H, role: "img",
+        "aria-label": "Expectancy per trade by gate setting, 2005 to 2014. Nasdaq-100: -0.04, 0.23, 0.58, 0.60. S&P 500: 0.14, 0.27, 0.42, 0.62." }, plot);
+      nt.ticks.forEach((v) => {
+        mk("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), class: v === 0 ? "zero" : "grid" }, svg);
+        txt(svg, m.l - 8, Y(v) + 4, v === 0 ? "0" : fmtR(v, 1), "tick", "end");
+      });
+      const band = (W - m.l - m.r) / cats.length;
+      const bw = Math.min(24, band * 0.3);
+      const gap = 4;
+      const labels = band >= 96;
+      const labelled = [0, 2];   // label the ungated baseline and the frozen setting; the rest live in tooltips and the table
+      cats.forEach((c, i) => {
+        const cx = m.l + band * (i + 0.5);
+        txt(svg, cx, H - m.b + 18, c[0], "tick", "middle");
+        if (c[1]) txt(svg, cx, H - m.b + 32, c[1], "sublabel", "middle");
+        series.forEach((s, k) => {
+          const x = cx - (bw + gap / 2) + k * (bw + gap);
+          const v = s.v[i];
+          const p = mk("path", { d: colPath(x, bw, Y(0), Y(v), 4), class: "bar", tabindex: "0",
+            style: "fill: var(" + s.color + ")", "aria-label": s.name + ", gate " + c[0] + ": " + fmtR(v, 2) }, svg);
+          if (labels && labelled.includes(i)) txt(svg, x + bw / 2, v >= 0 ? Y(v) - 6 : Y(v) + 14, fmtR(v, 2), "barlabel", "middle");
+          const showTip = () => {
+            tip.innerHTML = '<div class="tipdate">Gate ' + c[0] + (c[1] ? " · " + c[1] : "") + '</div><div class="tiprow"><span class="key" style="background: var(' +
+              s.color + ')"></span><span>' + s.name + "</span><b>" + fmtR(v, 2) + "</b></div>";
+            tip.hidden = false;
+            const tw = tip.offsetWidth;
+            let left = x + bw + 8;
+            if (left + tw > W - 4) left = x - tw - 8;
+            tip.style.left = Math.max(4, left) + "px";
+            tip.style.top = Math.max(4, Math.min(Y(v), Y(0)) - 10) + "px";
+          };
+          p.addEventListener("pointerenter", showTip);
+          p.addEventListener("focus", showTip);
+          p.addEventListener("pointerleave", () => { tip.hidden = true; });
+          p.addEventListener("blur", () => { tip.hidden = true; });
+        });
+      });
+      mk("line", { x1: m.l, x2: W - m.r, y1: Y(0), y2: Y(0), class: "zero" }, svg);
+    }
+    observe(plot, draw);
+    let html = '<thead><tr><th>Gate (ATR14 / ATR100)</th><th class="num">Nasdaq-100</th><th class="num">S&amp;P 500</th></tr></thead><tbody>';
+    cats.forEach((c, i) => {
+      html += "<tr><td>" + c[0] + (c[1] ? " (" + c[1] + ")" : "") + '</td><td class="num">' + fmtR(series[0].v[i], 2) +
+        '</td><td class="num">' + fmtR(series[1].v[i], 2) + "</td></tr>";
+    });
+    document.getElementById("t-gate").innerHTML = html + "</tbody>";
+  }
+
+  document.getElementById("c-ebm").dataset.table = "t-ebm";
+  document.getElementById("c-text").dataset.table = "t-text";
+  lineChart("c-ebm", [
+    { name: "Nasdaq-100", short: "Nasdaq-100", color: "--s1", d: DATA.ebm.nq.d, v: DATA.ebm.nq.v },
+    { name: "S&P 500", short: "S&P 500", color: "--s2", d: DATA.ebm.es.d, v: DATA.ebm.es.v }
+  ], "Cumulative R of the Expansion Breakaway Model, 2005 to May 2020. Nasdaq-100 ends at plus 63R; S&P 500 ends at plus 15R after losing 17R in the holdout.");
+  lineChart("c-text", [
+    { name: "ICT 2022 model", short: "2022 model", color: "--s3", d: DATA.textbook.ict.d, v: DATA.textbook.ict.v },
+    { name: "Silver Bullet", short: "Silver Bullet", color: "--s4", d: DATA.textbook.sb.d, v: DATA.textbook.sb.v }
+  ], "Cumulative R of mechanized textbook ICT setups on the Nasdaq-100, 2005 to May 2020. The 2022 model falls to about minus 1,030R and the Silver Bullet to about minus 450R.");
+  gateChart();
+})();
+</script>

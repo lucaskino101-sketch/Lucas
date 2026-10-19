@@ -1,0 +1,26 @@
+### NAS100_USD A) time-window long, gross bps/day and net with 1.0pt
+  01:00->03:00 days=2073 gross=+1.94bps t=+3.83 (H1 +2.08 t=+2.1, H2 +1.84 t=+3.6) net=-2.84bps t=-5.60
+  01:30->03:00 days=2084 gross=+1.78bps t=+3.84 (H1 +1.71 t=+1.9, H2 +1.83 t=+3.8) net=-3.01bps t=-6.46
+  01:30->04:00 days=2066 gross=+1.66bps t=+2.33 (H1 +1.29 t=+0.9, H2 +1.92 t=+2.6) net=-3.12bps t=-4.38
+  00:00->05:00 days=2041 gross=+2.48bps t=+2.71 (H1 +1.58 t=+0.9, H2 +3.10 t=+3.3) net=-2.30bps t=-2.50
+  01:30->09:30 days=2084 gross=+2.94bps t=+2.37 (H1 +1.22 t=+0.6, H2 +4.15 t=+2.9) net=-1.86bps t=-1.50
+  00:00->09:30 days=2085 gross=+3.58bps t=+2.81 (H1 +2.09 t=+0.9, H2 +4.66 t=+3.1) net=-1.23bps t=-0.96
+  02:00->05:00 days=2347 gross=+1.26bps t=+1.69 (H1 +0.06 t=+0.0, H2 +2.27 t=+2.8) net=-3.62bps t=-4.84
+
+### NAS100_USD B) ICT Judas swing at London (engine), net of 1.0pt
+tf= 1 mss_close exit=05:00 long                              n=  472 win=25.2% E=-0.444 (gross -0.004) t=-5.20 PF=0.57 Sh=-1.59 DD=-89.2% risk=2.7pt | H1 E=-0.551 H2 E=-0.379
+tf= 1 mss_close exit=05:00 both                              n=  928 win=23.3% E=-0.543 (gross -0.096) t=-9.36 PF=0.49 Sh=-2.85 DD=-99.5% risk=2.6pt | H1 E=-0.621 H2 E=-0.496
+tf= 1 mss_close exit=09:30 long                              n=  472 win=19.9% E=-0.420 (gross +0.020) t=-3.67 PF=0.64 Sh=-1.14 DD=-88.4% risk=2.7pt | H1 E=-0.514 H2 E=-0.363
+tf= 1 mss_close exit=09:30 both                              n=  928 win=16.9% E=-0.586 (gross -0.139) t=-7.78 PF=0.51 Sh=-2.39 DD=-99.7% risk=2.6pt | H1 E=-0.604 H2 E=-0.575
+tf= 5 mss_close exit=05:00 long                              n=  280 win=29.6% E=-0.349 (gross +0.013) t=-3.45 PF=0.61 Sh=-1.06 DD=-65.5% risk=3.6pt | H1 E=-0.493 H2 E=-0.252
+tf= 5 mss_close exit=05:00 both                              n=  565 win=28.0% E=-0.457 (gross -0.086) t=-6.93 PF=0.50 Sh=-2.10 DD=-93.2% risk=3.4pt | H1 E=-0.539 H2 E=-0.403
+tf= 5 mss_close exit=09:30 long                              n=  280 win=23.6% E=-0.387 (gross -0.025) t=-3.23 PF=0.63 Sh=-1.00 DD=-69.1% risk=3.6pt | H1 E=-0.556 H2 E=-0.273
+tf= 5 mss_close exit=09:30 both                              n=  565 win=20.7% E=-0.536 (gross -0.165) t=-6.68 PF=0.51 Sh=-2.03 DD=-95.7% risk=3.4pt | H1 E=-0.576 H2 E=-0.510
+tf= 5 fvg       exit=05:00 long                              n=  144 win=26.4% E=-0.354 (gross +0.044) t=-2.36 PF=0.61 Sh=-0.73 DD=-41.4% risk=3.0pt | H1 E=-0.400 H2 E=-0.327
+tf= 5 fvg       exit=05:00 both                              n=  287 win=26.1% E=-0.395 (gross +0.023) t=-3.90 PF=0.58 Sh=-1.20 DD=-70.0% risk=2.8pt | H1 E=-0.510 H2 E=-0.324
+tf= 5 fvg       exit=09:30 long                              n=  144 win=20.1% E=-0.351 (gross +0.047) t=-1.95 PF=0.67 Sh=-0.61 DD=-43.2% risk=3.0pt | H1 E=-0.346 H2 E=-0.354
+tf= 5 fvg       exit=09:30 both                              n=  287 win=18.1% E=-0.483 (gross -0.065) t=-4.08 PF=0.56 Sh=-1.25 DD=-76.4% risk=2.8pt | H1 E=-0.535 H2 E=-0.451
+tf=15 fvg       exit=05:00 long                              n=   37 win=24.3% E=-0.602 (gross -0.241) t=-2.67 PF=0.36 Sh=-0.77 DD=-23.4% risk=3.4pt | H1 E=-1.041 H2 E=-0.228
+tf=15 fvg       exit=05:00 both                              n=   74 win=27.0% E=-0.336 (gross +0.041) t=-1.72 PF=0.62 Sh=-0.53 DD=-31.4% risk=3.1pt | H1 E=-0.423 H2 E=-0.277
+tf=15 fvg       exit=09:30 long                              n=   37 win=13.5% E=-0.684 (gross -0.323) t=-2.34 PF=0.39 Sh=-0.69 DD=-26.6% risk=3.4pt | H1 E=-1.219 H2 E=-0.229
+tf=15 fvg       exit=09:30 both                              n=   74 win=14.9% E=-0.676 (gross -0.299) t=-3.48 PF=0.40 Sh=-1.02 DD=-42.2% risk=3.1pt | H1 E=-0.884 H2 E=-0.534

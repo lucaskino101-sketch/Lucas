@@ -1,0 +1,20 @@
+### SPX500_USD M1 noise-area momentum, 1x notional, net of 1.0pt/trade
+  IS all: days=2306 trades=2407 ann.ret=-11.1% vol=8.3% Sharpe=-1.34
+  2005-09: days=1177 trades=1271 ann.ret=-9.7% vol=9.6% Sharpe=-1.01
+  2010-14: days=1129 trades=1136 ann.ret=-12.5% vol=6.6% Sharpe=-1.89
+year
+2005    -29.5%/yr
+2006    -17.1%/yr
+2007    -15.8%/yr
+2008    +23.9%/yr
+2009    -12.9%/yr
+2010    -21.0%/yr
+2011     -9.8%/yr
+2012    -10.0%/yr
+2013    -11.3%/yr
+2014     -9.3%/yr
+
+### SPX500_USD M3 30-min ORB, stop=other side of range, exit 15:55
+  IS all: n=2279 win=37.3% E=-0.208R t=-8.40
+  2005-09: n=1153 win=36.4% E=-0.196R t=-5.35
+  2010-14: n=1126 win=38.1% E=-0.220R t=-6.62

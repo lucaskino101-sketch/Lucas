@@ -1,0 +1,24 @@
+GBP_USD london tf= 1 fvg       tgt=rr                        n= 1706 win=33.4% E=-0.162 (gross -0.007) t=-4.73 PF=0.79 Sh=-1.47 DD=-95.4% risk=0.0pt | H1 E=-0.106 H2 E=-0.217
+GBP_USD london tf= 1 fvg       tgt=liq                       n= 1827 win=26.7% E=-0.110 (gross +0.045) t=-2.52 PF=0.87 Sh=-0.79 DD=-93.2% risk=0.0pt | H1 E=-0.030 H2 E=-0.189
+GBP_USD london tf= 1 mss_close tgt=rr                        n= 2025 win=35.2% E=-0.083 (gross +0.045) t=-2.64 PF=0.89 Sh=-0.82 DD=-88.1% risk=0.0pt | H1 E=-0.052 H2 E=-0.113
+GBP_USD london tf= 1 mss_close tgt=liq                       n= 2025 win=29.3% E=-0.079 (gross +0.049) t=-2.03 PF=0.90 Sh=-0.63 DD=-90.4% risk=0.0pt | H1 E=-0.054 H2 E=-0.103
+GBP_USD london tf= 5 fvg       tgt=rr                        n=  803 win=36.9% E=-0.019 (gross +0.086) t=-0.39 PF=0.97 Sh=-0.12 DD=-46.5% risk=0.0pt | H1 E=-0.065 H2 E=+0.019
+GBP_USD london tf= 5 fvg       tgt=liq                       n=  861 win=30.8% E=-0.034 (gross +0.074) t=-0.57 PF=0.96 Sh=-0.18 DD=-52.1% risk=0.0pt | H1 E=-0.098 H2 E=+0.021
+GBP_USD london tf= 5 mss_close tgt=rr                        n= 1325 win=37.3% E=-0.039 (gross +0.038) t=-1.04 PF=0.94 Sh=-0.32 DD=-58.5% risk=0.0pt | H1 E=-0.062 H2 E=-0.018
+GBP_USD london tf= 5 mss_close tgt=liq                       n= 1325 win=32.5% E=-0.064 (gross +0.013) t=-1.45 PF=0.91 Sh=-0.45 DD=-68.0% risk=0.0pt | H1 E=-0.047 H2 E=-0.080
+GBP_USD london tf=15 fvg       tgt=rr                        n=  307 win=39.1% E=+0.026 (gross +0.102) t=+0.33 PF=1.04 Sh=+0.10 DD=-24.3% risk=0.0pt | H1 E=+0.187 H2 E=-0.087
+GBP_USD london tf=15 fvg       tgt=liq                       n=  315 win=34.0% E=-0.009 (gross +0.069) t=-0.10 PF=0.99 Sh=-0.03 DD=-29.8% risk=0.0pt | H1 E=+0.142 H2 E=-0.114
+GBP_USD london tf=15 mss_close tgt=rr                        n=  883 win=39.6% E=-0.016 (gross +0.040) t=-0.38 PF=0.97 Sh=-0.12 DD=-36.8% risk=0.0pt | H1 E=+0.043 H2 E=-0.059
+GBP_USD london tf=15 mss_close tgt=liq                       n=  883 win=36.9% E=-0.010 (gross +0.046) t=-0.21 PF=0.98 Sh=-0.07 DD=-35.6% risk=0.0pt | H1 E=+0.037 H2 E=-0.045
+GBP_USD ny     tf= 1 fvg       tgt=rr                        n= 1357 win=34.3% E=-0.144 (gross +0.006) t=-3.77 PF=0.81 Sh=-1.17 DD=-88.8% risk=0.0pt | H1 E=-0.042 H2 E=-0.235
+GBP_USD ny     tf= 1 fvg       tgt=liq                       n= 1444 win=26.2% E=-0.160 (gross -0.009) t=-3.37 PF=0.81 Sh=-1.05 DD=-93.7% risk=0.0pt | H1 E=-0.069 H2 E=-0.243
+GBP_USD ny     tf= 1 mss_close tgt=rr                        n= 1649 win=34.6% E=-0.128 (gross -0.006) t=-3.78 PF=0.82 Sh=-1.18 DD=-90.2% risk=0.0pt | H1 E=-0.044 H2 E=-0.208
+GBP_USD ny     tf= 1 mss_close tgt=liq                       n= 1649 win=29.9% E=-0.136 (gross -0.013) t=-3.38 PF=0.83 Sh=-1.05 DD=-92.3% risk=0.0pt | H1 E=-0.045 H2 E=-0.222
+GBP_USD ny     tf= 5 fvg       tgt=rr                        n=  604 win=34.6% E=-0.127 (gross -0.023) t=-2.34 PF=0.82 Sh=-0.73 DD=-58.0% risk=0.0pt | H1 E=-0.011 H2 E=-0.227
+GBP_USD ny     tf= 5 fvg       tgt=liq                       n=  631 win=31.1% E=-0.149 (gross -0.043) t=-2.50 PF=0.80 Sh=-0.78 DD=-65.4% risk=0.0pt | H1 E=-0.037 H2 E=-0.247
+GBP_USD ny     tf= 5 mss_close tgt=rr                        n= 1040 win=38.7% E=-0.104 (gross -0.030) t=-2.70 PF=0.83 Sh=-0.84 DD=-71.5% risk=0.0pt | H1 E=-0.023 H2 E=-0.177
+GBP_USD ny     tf= 5 mss_close tgt=liq                       n= 1040 win=36.8% E=-0.122 (gross -0.048) t=-2.99 PF=0.81 Sh=-0.93 DD=-77.1% risk=0.0pt | H1 E=-0.047 H2 E=-0.191
+GBP_USD ny     tf=15 fvg       tgt=rr                        n=  198 win=36.4% E=-0.146 (gross -0.070) t=-1.63 PF=0.78 Sh=-0.51 DD=-30.8% risk=0.0pt | H1 E=-0.209 H2 E=-0.082
+GBP_USD ny     tf=15 fvg       tgt=liq                       n=  200 win=34.5% E=-0.211 (gross -0.135) t=-2.29 PF=0.69 Sh=-0.71 DD=-35.5% risk=0.0pt | H1 E=-0.293 H2 E=-0.126
+GBP_USD ny     tf=15 mss_close tgt=rr                        n=  654 win=41.0% E=-0.109 (gross -0.057) t=-2.57 PF=0.79 Sh=-0.80 DD=-54.0% risk=0.0pt | H1 E=-0.050 H2 E=-0.169
+GBP_USD ny     tf=15 mss_close tgt=liq                       n=  654 win=40.5% E=-0.090 (gross -0.038) t=-1.94 PF=0.83 Sh=-0.60 DD=-51.8% risk=0.0pt | H1 E=-0.039 H2 E=-0.143

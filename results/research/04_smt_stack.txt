@@ -1,0 +1,30 @@
+tf= 1 fvg       smt=0 stack>=1                               n= 1968 win=31.0% E=-0.358 (gross -0.078) t=-11.67 PF=0.59 Sh=-3.63 DD=-99.9% risk=4.6pt | H1 E=-0.333 H2 E=-0.382
+tf= 1 fvg       smt=0 stack>=2                               n= 1719 win=31.9% E=-0.327 (gross -0.054) t=-9.96 PF=0.61 Sh=-3.09 DD=-99.7% risk=4.7pt | H1 E=-0.281 H2 E=-0.372
+tf= 1 fvg       smt=1 stack>=1                               n= 1014 win=31.4% E=-0.346 (gross -0.068) t=-8.06 PF=0.60 Sh=-2.48 DD=-97.4% risk=4.6pt | H1 E=-0.362 H2 E=-0.331
+tf= 1 fvg       smt=1 stack>=2                               n=  808 win=32.4% E=-0.312 (gross -0.039) t=-6.46 PF=0.63 Sh=-1.99 DD=-92.6% risk=4.7pt | H1 E=-0.308 H2 E=-0.315
+tf= 1 fvg       smt=2 stack>=1                               n=  577 win=30.8% E=-0.368 (gross -0.085) t=-6.48 PF=0.58 Sh=-1.98 DD=-88.9% risk=4.5pt | H1 E=-0.471 H2 E=-0.273
+tf= 1 fvg       smt=2 stack>=2                               n=  329 win=32.8% E=-0.317 (gross -0.039) t=-4.18 PF=0.62 Sh=-1.28 DD=-66.6% risk=4.6pt | H1 E=-0.470 H2 E=-0.196
+tf= 5 fvg       smt=0 stack>=1                               n=  916 win=32.5% E=-0.269 (gross -0.096) t=-6.34 PF=0.64 Sh=-1.96 DD=-92.7% risk=7.4pt | H1 E=-0.202 H2 E=-0.336
+tf= 5 fvg       smt=0 stack>=2                               n=  674 win=35.5% E=-0.186 (gross -0.017) t=-3.71 PF=0.74 Sh=-1.15 DD=-75.6% risk=7.5pt | H1 E=-0.048 H2 E=-0.334
+tf= 5 fvg       smt=1 stack>=1                               n=  450 win=33.3% E=-0.253 (gross -0.080) t=-4.17 PF=0.66 Sh=-1.29 DD=-71.7% risk=7.3pt | H1 E=-0.198 H2 E=-0.307
+tf= 5 fvg       smt=1 stack>=2                               n=  332 win=33.1% E=-0.268 (gross -0.095) t=-3.86 PF=0.64 Sh=-1.19 DD=-61.9% risk=7.4pt | H1 E=-0.151 H2 E=-0.378
+tf= 5 fvg       smt=2 stack>=1                               n=  282 win=31.9% E=-0.286 (gross -0.108) t=-3.71 PF=0.63 Sh=-1.14 DD=-61.0% risk=7.2pt | H1 E=-0.313 H2 E=-0.262
+tf= 5 fvg       smt=2 stack>=2                               n=  161 win=30.4% E=-0.348 (gross -0.166) t=-3.54 PF=0.56 Sh=-1.07 DD=-50.2% risk=7.2pt | H1 E=-0.330 H2 E=-0.363
+tf= 5 mss_close smt=0 stack>=1                               n= 1700 win=37.0% E=-0.146 (gross -0.001) t=-4.74 PF=0.78 Sh=-1.48 DD=-93.7% risk=9.3pt | H1 E=-0.187 H2 E=-0.105
+tf= 5 mss_close smt=0 stack>=2                               n= 1353 win=38.7% E=-0.111 (gross +0.014) t=-3.35 PF=0.82 Sh=-1.05 DD=-81.6% risk=10.2pt | H1 E=-0.108 H2 E=-0.115
+tf= 5 mss_close smt=1 stack>=1                               n=  918 win=37.1% E=-0.164 (gross -0.025) t=-3.99 PF=0.75 Sh=-1.24 DD=-81.7% risk=9.5pt | H1 E=-0.223 H2 E=-0.111
+tf= 5 mss_close smt=1 stack>=2                               n=  680 win=37.9% E=-0.140 (gross -0.013) t=-3.01 PF=0.78 Sh=-0.94 DD=-66.3% risk=10.1pt | H1 E=-0.100 H2 E=-0.174
+tf= 5 mss_close smt=2 stack>=1                               n=  582 win=35.4% E=-0.189 (gross -0.042) t=-3.61 PF=0.72 Sh=-1.12 DD=-71.2% risk=9.0pt | H1 E=-0.300 H2 E=-0.091
+tf= 5 mss_close smt=2 stack>=2                               n=  315 win=34.3% E=-0.190 (gross -0.058) t=-2.73 PF=0.71 Sh=-0.85 DD=-50.1% risk=9.6pt | H1 E=-0.162 H2 E=-0.212
+tf=15 fvg       smt=0 stack>=1                               n=  330 win=39.1% E=-0.117 (gross -0.005) t=-1.89 PF=0.79 Sh=-0.59 DD=-41.2% risk=11.1pt | H1 E=-0.102 H2 E=-0.132
+tf=15 fvg       smt=0 stack>=2                               n=  229 win=41.0% E=-0.051 (gross +0.058) t=-0.68 PF=0.90 Sh=-0.21 DD=-25.4% risk=11.2pt | H1 E=-0.053 H2 E=-0.049
+tf=15 fvg       smt=1 stack>=1                               n=  145 win=37.2% E=-0.191 (gross -0.078) t=-2.13 PF=0.66 Sh=-0.66 DD=-27.7% risk=10.9pt | H1 E=-0.180 H2 E=-0.201
+tf=15 fvg       smt=1 stack>=2                               n=  107 win=38.3% E=-0.137 (gross -0.028) t=-1.28 PF=0.75 Sh=-0.40 DD=-17.8% risk=11.0pt | H1 E=-0.156 H2 E=-0.119
+tf=15 fvg       smt=2 stack>=1                               n=   88 win=36.4% E=-0.207 (gross -0.088) t=-1.81 PF=0.64 Sh=-0.56 DD=-20.2% risk=10.9pt | H1 E=-0.193 H2 E=-0.218
+tf=15 fvg       smt=2 stack>=2                               n=   50 win=38.0% E=-0.102 (gross +0.010) t=-0.64 PF=0.81 Sh=-0.20 DD= -9.6% risk=11.0pt | H1 E=-0.146 H2 E=-0.071
+tf=15 ifvg      smt=0 stack>=1                               n=  299 win=34.4% E=-0.180 (gross -0.020) t=-2.38 PF=0.75 Sh=-0.74 DD=-46.5% risk=8.4pt | H1 E=-0.098 H2 E=-0.261
+tf=15 ifvg      smt=0 stack>=2                               n=  235 win=36.2% E=-0.110 (gross +0.035) t=-1.29 PF=0.83 Sh=-0.40 DD=-33.4% risk=9.0pt | H1 E=+0.016 H2 E=-0.240
+tf=15 ifvg      smt=1 stack>=1                               n=  136 win=30.9% E=-0.253 (gross -0.088) t=-2.26 PF=0.66 Sh=-0.70 DD=-30.1% risk=8.1pt | H1 E=-0.139 H2 E=-0.345
+tf=15 ifvg      smt=1 stack>=2                               n=  108 win=31.5% E=-0.218 (gross -0.067) t=-1.75 PF=0.70 Sh=-0.54 DD=-22.5% risk=8.6pt | H1 E=-0.087 H2 E=-0.322
+tf=15 ifvg      smt=2 stack>=1                               n=   78 win=25.6% E=-0.431 (gross -0.248) t=-3.06 PF=0.49 Sh=-0.91 DD=-29.0% risk=7.4pt | H1 E=-0.330 H2 E=-0.506
+tf=15 ifvg      smt=2 stack>=2                               n=   49 win=24.5% E=-0.441 (gross -0.276) t=-2.58 PF=0.46 Sh=-0.76 DD=-19.8% risk=8.1pt | H1 E=-0.328 H2 E=-0.520

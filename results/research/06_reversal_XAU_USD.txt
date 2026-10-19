@@ -1,0 +1,24 @@
+XAU_USD london tf= 1 fvg       tgt=rr                        n= 1225 win=34.1% E=-0.312 (gross +0.020) t=-7.65 PF=0.64 Sh=-2.52 DD=-98.2% risk=1.5pt | H1 E=-0.357 H2 E=-0.281
+XAU_USD london tf= 1 fvg       tgt=liq                       n= 1280 win=26.8% E=-0.315 (gross +0.019) t=-6.26 PF=0.68 Sh=-2.07 DD=-98.8% risk=1.5pt | H1 E=-0.321 H2 E=-0.311
+XAU_USD london tf= 1 mss_close tgt=rr                        n= 1473 win=34.4% E=-0.270 (gross +0.021) t=-7.24 PF=0.68 Sh=-2.40 DD=-98.7% risk=1.9pt | H1 E=-0.207 H2 E=-0.316
+XAU_USD london tf= 1 mss_close tgt=liq                       n= 1473 win=28.1% E=-0.259 (gross +0.031) t=-5.63 PF=0.72 Sh=-1.87 DD=-98.8% risk=1.9pt | H1 E=-0.232 H2 E=-0.280
+XAU_USD london tf= 5 fvg       tgt=rr                        n=  472 win=32.6% E=-0.292 (gross -0.022) t=-4.46 PF=0.66 Sh=-1.46 DD=-79.4% risk=1.9pt | H1 E=-0.243 H2 E=-0.328
+XAU_USD london tf= 5 fvg       tgt=liq                       n=  488 win=25.8% E=-0.367 (gross -0.095) t=-4.96 PF=0.61 Sh=-1.62 DD=-85.9% risk=1.9pt | H1 E=-0.307 H2 E=-0.409
+XAU_USD london tf= 5 mss_close tgt=rr                        n=  830 win=35.5% E=-0.145 (gross +0.053) t=-2.94 PF=0.81 Sh=-0.98 DD=-76.6% risk=2.7pt | H1 E=-0.103 H2 E=-0.176
+XAU_USD london tf= 5 mss_close tgt=liq                       n=  830 win=30.1% E=-0.169 (gross +0.029) t=-2.90 PF=0.79 Sh=-0.96 DD=-83.4% risk=2.7pt | H1 E=-0.076 H2 E=-0.236
+XAU_USD london tf=15 fvg       tgt=rr                        n=  166 win=31.9% E=-0.266 (gross -0.058) t=-2.44 PF=0.68 Sh=-0.80 DD=-39.4% risk=2.5pt | H1 E=-0.338 H2 E=-0.212
+XAU_USD london tf=15 fvg       tgt=liq                       n=  170 win=27.1% E=-0.355 (gross -0.147) t=-2.98 PF=0.60 Sh=-0.97 DD=-50.2% risk=2.5pt | H1 E=-0.382 H2 E=-0.334
+XAU_USD london tf=15 mss_close tgt=rr                        n=  500 win=37.4% E=-0.086 (gross +0.064) t=-1.41 PF=0.88 Sh=-0.47 DD=-50.6% risk=3.7pt | H1 E=-0.009 H2 E=-0.146
+XAU_USD london tf=15 mss_close tgt=liq                       n=  500 win=33.4% E=-0.080 (gross +0.070) t=-1.09 PF=0.89 Sh=-0.36 DD=-56.0% risk=3.7pt | H1 E=+0.016 H2 E=-0.153
+XAU_USD ny     tf= 1 fvg       tgt=rr                        n= 1348 win=32.9% E=-0.314 (gross -0.027) t=-8.21 PF=0.64 Sh=-2.71 DD=-98.8% risk=1.9pt | H1 E=-0.406 H2 E=-0.247
+XAU_USD ny     tf= 1 fvg       tgt=liq                       n= 1431 win=27.5% E=-0.278 (gross +0.015) t=-5.92 PF=0.70 Sh=-1.96 DD=-98.6% risk=1.9pt | H1 E=-0.347 H2 E=-0.229
+XAU_USD ny     tf= 1 mss_close tgt=rr                        n= 1639 win=35.6% E=-0.204 (gross +0.038) t=-5.89 PF=0.74 Sh=-1.96 DD=-97.2% risk=2.4pt | H1 E=-0.242 H2 E=-0.177
+XAU_USD ny     tf= 1 mss_close tgt=liq                       n= 1639 win=31.4% E=-0.200 (gross +0.043) t=-4.90 PF=0.76 Sh=-1.63 DD=-97.3% risk=2.4pt | H1 E=-0.237 H2 E=-0.172
+XAU_USD ny     tf= 5 fvg       tgt=rr                        n=  677 win=34.9% E=-0.214 (gross -0.017) t=-4.16 PF=0.72 Sh=-1.37 DD=-80.4% risk=2.9pt | H1 E=-0.204 H2 E=-0.222
+XAU_USD ny     tf= 5 fvg       tgt=liq                       n=  693 win=32.8% E=-0.205 (gross -0.003) t=-3.59 PF=0.74 Sh=-1.19 DD=-80.9% risk=2.8pt | H1 E=-0.129 H2 E=-0.257
+XAU_USD ny     tf= 5 mss_close tgt=rr                        n= 1147 win=37.2% E=-0.118 (gross +0.029) t=-3.10 PF=0.82 Sh=-1.03 DD=-80.4% risk=4.0pt | H1 E=-0.040 H2 E=-0.175
+XAU_USD ny     tf= 5 mss_close tgt=liq                       n= 1147 win=34.4% E=-0.128 (gross +0.019) t=-2.93 PF=0.81 Sh=-0.98 DD=-82.5% risk=4.0pt | H1 E=-0.064 H2 E=-0.175
+XAU_USD ny     tf=15 fvg       tgt=rr                        n=  282 win=37.9% E=-0.145 (gross -0.002) t=-1.97 PF=0.77 Sh=-0.65 DD=-41.1% risk=3.9pt | H1 E=-0.089 H2 E=-0.180
+XAU_USD ny     tf=15 fvg       tgt=liq                       n=  299 win=35.8% E=-0.162 (gross -0.012) t=-1.98 PF=0.76 Sh=-0.66 DD=-44.8% risk=3.8pt | H1 E=-0.188 H2 E=-0.144
+XAU_USD ny     tf=15 mss_close tgt=rr                        n=  809 win=36.6% E=-0.128 (gross -0.019) t=-3.10 PF=0.78 Sh=-1.03 DD=-70.6% risk=5.3pt | H1 E=-0.038 H2 E=-0.192
+XAU_USD ny     tf=15 mss_close tgt=liq                       n=  809 win=34.7% E=-0.105 (gross +0.004) t=-2.16 PF=0.83 Sh=-0.72 DD=-68.2% risk=5.3pt | H1 E=-0.011 H2 E=-0.172

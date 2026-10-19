@@ -1,0 +1,311 @@
+//@version=6
+// ─────────────────────────────────────────────────────────────────────────────
+// EXPANSION BREAKAWAY MODEL (EBM) — an ICT breakaway-FVG continuation model
+// gated by a volatility-expansion regime.
+//
+// Research summary (see docs/MODEL.md in the repository):
+//   Built on 2005-2014 Nasdaq-100 / S&P 500 1-minute data, frozen, then run
+//   once on an untouched 2015-2020 holdout.
+//   Holdout NQ: 58 trades, 36% wins, +0.31R/trade after 1pt costs, PF 1.45.
+//   Holdout ES: 47 trades, -0.35R/trade. FX and gold: negative.
+//   The edge is NOT statistically proven (t ~ 1) and depends on a few big trend
+//   days. Treat this script as a forward-testing tool, not a money machine.
+//
+// Rules (longs; shorts mirror):
+//   1. Gate: ATR14 / ATR100 of prior daily ranges >= 1.10.
+//   2. Liquidity at 09:30 NY: overnight, previous-day, pre-market (07:00-09:30),
+//      Asia (20:00-24:00), London (02:00-05:00) and previous cash-session highs
+//      above the open and within 1.5 ATR.
+//   3. 09:30-11:30: price runs one or more of those highs.
+//   4. A 15m candle closes above the highest run level and the breakout leg
+//      holds a bullish 15m FVG.
+//   5. Limit buy at the FVG's 50% (CE) until 12:00; cancelled if a 15m candle
+//      closes back below the run level.
+//   6. Stop at the run level; 0.05-0.6 ATR (and >= floor points) or skip.
+//   7. Exit 15:55 NY (or stop). One trade per day.
+//
+// Use on a 1, 3 or 5 minute chart of NQ/MNQ or ES/MES futures (Globex session).
+// Educational research code, not financial advice.
+// ─────────────────────────────────────────────────────────────────────────────
+strategy("Expansion Breakaway Model (EBM)", shorttitle = "EBM", overlay = true, pyramiding = 0,
+     initial_capital = 100000, default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 2.25, slippage = 1,
+     max_boxes_count = 500, max_lines_count = 500, max_labels_count = 500)
+
+// ── Inputs ───────────────────────────────────────────────────────────────────
+grpR = "Regime gate"
+useGate    = input.bool(true, "Require volatility expansion", group = grpR)
+gateMin    = input.float(1.10, "ATR14 / ATR100 at least", step = 0.05, group = grpR)
+grpL = "Liquidity"
+maxDistAtr = input.float(1.5, "Max level distance from 09:30 open (x ATR14)", step = 0.1, group = grpL)
+grpK = "Risk & exit"
+minRiskAtr = input.float(0.05, "Min stop distance (x ATR14)", step = 0.01, group = grpK)
+minRiskPts = input.float(2.0, "Min stop distance (points: NQ 2, ES 1)", step = 0.25, group = grpK)
+maxRiskAtr = input.float(0.60, "Max stop distance (x ATR14)", step = 0.05, group = grpK)
+exitMode   = input.string("Hold to 15:55", "Exit", options = ["Hold to 15:55", "3R target", "Breakeven at +1R"], group = grpK)
+riskPct    = input.float(0.0, "Risk % of equity per trade (0 = fixed quantity)", minval = 0, step = 0.25, group = grpK)
+grpV = "Visuals"
+showLevels = input.bool(true, "Draw the 09:30 liquidity map", group = grpV)
+showTable  = input.bool(true, "Show regime panel", group = grpV)
+
+TZ = "America/New_York"
+
+// ── Clock ────────────────────────────────────────────────────────────────────
+nyMod    = hour(time, TZ) * 60 + minute(time, TZ)                // bar-open minute of day, NY
+chartMin = timeframe.isminutes ? timeframe.multiplier : 0
+shifted  = time + 6 * 60 * 60 * 1000                             // Globex day: 18:00 -> 17:00
+tdayKey  = year(shifted, TZ) * 10000 + month(shifted, TZ) * 100 + dayofmonth(shifted, TZ)
+newTday  = tdayKey != nz(tdayKey[1])
+nextMod  = nyMod + chartMin                                       // minute at which the next bar opens
+
+// ── Daily context (previous completed Globex day, non-repainting) ───────────
+[a14, a100, pdh, pdl] = request.security(syminfo.tickerid, "D",
+     [ta.sma(high - low, 14)[1], ta.sma(high - low, 100)[1], high[1], low[1]],
+     lookahead = barmerge.lookahead_on)
+regime = a100 > 0 ? a14 / a100 : na
+gateOk = not useGate or (not na(regime) and regime >= gateMin)
+
+// ── Session liquidity trackers (reset each Globex day) ──────────────────────
+var float onH = na
+var float onL = na
+var float asH = na
+var float asL = na
+var float loH = na
+var float loL = na
+var float prH = na
+var float prL = na
+var float rthH = na
+var float rthL = na
+var float prevRthH = na
+var float prevRthL = na
+
+// ── 15-minute structure built from chart bars ───────────────────────────────
+var array<float> hb = array.new<float>()
+var array<float> lb = array.new<float>()
+var array<float> cb = array.new<float>()
+var float bH = na
+var float bL = na
+
+// ── Setup state ──────────────────────────────────────────────────────────────
+var bool dayInit = false
+var bool tradedToday = false
+var float openPx = na
+var array<float> buyLv = array.new<float>()
+var array<float> sellLv = array.new<float>()
+var float lRun = na       // highest buy-side level run (long breakaway)
+var int   lBrk = na       // 15m index of the first run
+var float sRun = na       // lowest sell-side level run (short breakaway)
+var int   sBrk = na
+var int   lState = 0      // 0 idle, 1 limit order working
+var int   sState = 0
+var float lLvl = na
+var float sLvl = na
+var float lRisk = na
+var float sRisk = na
+var bool  beDone = false
+
+if newTday
+    prevRthH := rthH
+    prevRthL := rthL
+    onH := na
+    onL := na
+    asH := na
+    asL := na
+    loH := na
+    loL := na
+    prH := na
+    prL := na
+    rthH := na
+    rthL := na
+    dayInit := false
+    tradedToday := false
+    lRun := na
+    lBrk := na
+    sRun := na
+    sBrk := na
+    lState := 0
+    sState := 0
+    array.clear(hb)
+    array.clear(lb)
+    array.clear(cb)
+    array.clear(buyLv)
+    array.clear(sellLv)
+
+// 09:30 snapshot happens before this bar updates any tracker
+if not dayInit and nyMod >= 570 and nyMod < 960 and not na(a14)
+    dayInit := true
+    openPx := open
+    maxD = maxDistAtr * a14
+    for v in array.from(onH, pdh, prH, asH, loH, prevRthH)
+        if not na(v) and v > openPx and v <= openPx + maxD
+            array.push(buyLv, v)
+    for v in array.from(onL, pdl, prL, asL, loL, prevRthL)
+        if not na(v) and v < openPx and v >= openPx - maxD
+            array.push(sellLv, v)
+    if showLevels and gateOk
+        for v in buyLv
+            line.new(time, v, time + 390 * 60000, v, xloc = xloc.bar_time, color = color.new(color.teal, 40), style = line.style_dotted)
+        for v in sellLv
+            line.new(time, v, time + 390 * 60000, v, xloc = xloc.bar_time, color = color.new(color.maroon, 40), style = line.style_dotted)
+
+// session trackers
+if nyMod >= 1080 or nyMod < 570
+    onH := na(onH) ? high : math.max(onH, high)
+    onL := na(onL) ? low : math.min(onL, low)
+if nyMod >= 1200
+    asH := na(asH) ? high : math.max(asH, high)
+    asL := na(asL) ? low : math.min(asL, low)
+if nyMod >= 120 and nyMod < 300
+    loH := na(loH) ? high : math.max(loH, high)
+    loL := na(loL) ? low : math.min(loL, low)
+if nyMod >= 420 and nyMod < 570
+    prH := na(prH) ? high : math.max(prH, high)
+    prL := na(prL) ? low : math.min(prL, low)
+if nyMod >= 570 and nyMod < 960
+    rthH := na(rthH) ? high : math.max(rthH, high)
+    rthL := na(rthL) ? low : math.min(rthL, low)
+
+// 15m aggregation (buckets aligned to :00/:15/:30/:45, so 09:30 starts a bucket)
+bucket = math.floor(nyMod / 15)
+if newTday or bucket != bucket[1]
+    bH := high
+    bL := low
+else
+    bH := math.max(bH, high)
+    bL := math.min(bL, low)
+lastOfBucket = chartMin > 0 and chartMin <= 15 and math.floor(nextMod / 15) != bucket
+
+// ── Fills: first fill of the day wins, the other side is cancelled ──────────
+if strategy.position_size > 0 and nz(strategy.position_size[1]) <= 0
+    tradedToday := true
+    lState := 0
+    beDone := false
+    strategy.cancel("EBM S")
+    sState := 0
+if strategy.position_size < 0 and nz(strategy.position_size[1]) >= 0
+    tradedToday := true
+    sState := 0
+    beDone := false
+    strategy.cancel("EBM L")
+    lState := 0
+
+flat = strategy.position_size == 0
+
+// ── Liquidity runs (only while idle) ─────────────────────────────────────────
+inRun = nyMod >= 570 and nyMod < 690
+if dayInit and gateOk and inRun and not tradedToday and flat
+    if lState == 0 and array.size(buyLv) > 0
+        for i = array.size(buyLv) - 1 to 0
+            v = array.get(buyLv, i)
+            if high > v
+                lRun := na(lRun) ? v : math.max(lRun, v)
+                if na(lBrk)
+                    lBrk := array.size(hb)
+                array.remove(buyLv, i)
+    if sState == 0 and array.size(sellLv) > 0
+        for i = array.size(sellLv) - 1 to 0
+            v = array.get(sellLv, i)
+            if low < v
+                sRun := na(sRun) ? v : math.min(sRun, v)
+                if na(sBrk)
+                    sBrk := array.size(hb)
+                array.remove(sellLv, i)
+
+// ── 15m close: cancel failed breakouts, arm new breakaway entries ───────────
+if lastOfBucket
+    array.push(hb, bH)
+    array.push(lb, bL)
+    array.push(cb, close)
+    j = array.size(cb) - 1
+    c15 = array.get(cb, j)
+    if lState == 1 and flat and c15 < lLvl
+        strategy.cancel("EBM L")
+        lState := 0
+    if sState == 1 and flat and c15 > sLvl
+        strategy.cancel("EBM S")
+        sState := 0
+    if dayInit and gateOk and not tradedToday and flat and nyMod < 720
+        // LONG: acceptance above the highest run level + bullish FVG in the breakout leg
+        if lState == 0 and not na(lRun) and c15 > lRun
+            kMin = math.max(lBrk, 2)
+            int kFound = -1
+            if j >= kMin
+                for k = j to kMin
+                    if array.get(lb, k) > array.get(hb, k - 2)
+                        kFound := k
+                        break
+            if kFound >= 0
+                top = array.get(lb, kFound)
+                bot = array.get(hb, kFound - 2)
+                ce = (top + bot) / 2
+                risk = ce - lRun
+                if risk >= math.max(minRiskAtr * a14, minRiskPts) and risk <= maxRiskAtr * a14
+                    q = riskPct > 0 ? math.max(1, math.floor(strategy.equity * riskPct / 100 / (risk * syminfo.pointvalue))) : na
+                    strategy.entry("EBM L", strategy.long, qty = q, limit = ce)
+                    strategy.exit("EBM L x", "EBM L", stop = lRun, limit = exitMode == "3R target" ? ce + 3 * risk : na)
+                    box.new(time - 2 * 15 * 60000, top, time + 15 * 60000, bot, xloc = xloc.bar_time,
+                         bgcolor = color.new(color.teal, 80), border_color = color.teal)
+                    label.new(bar_index, ce, "EBM long @CE", style = label.style_label_left, color = color.teal, textcolor = color.white, size = size.small)
+                    alert("EBM long armed: limit " + str.tostring(ce, format.mintick) + " stop " + str.tostring(lRun, format.mintick), alert.freq_once_per_bar_close)
+                    lState := 1
+                    lLvl := lRun
+                    lRisk := risk
+                    lRun := na
+                    lBrk := na
+        // SHORT: mirror
+        if sState == 0 and not na(sRun) and c15 < sRun
+            kMin = math.max(sBrk, 2)
+            int kFound = -1
+            if j >= kMin
+                for k = j to kMin
+                    if array.get(hb, k) < array.get(lb, k - 2)
+                        kFound := k
+                        break
+            if kFound >= 0
+                bot = array.get(hb, kFound)
+                top = array.get(lb, kFound - 2)
+                ce = (top + bot) / 2
+                risk = sRun - ce
+                if risk >= math.max(minRiskAtr * a14, minRiskPts) and risk <= maxRiskAtr * a14
+                    q = riskPct > 0 ? math.max(1, math.floor(strategy.equity * riskPct / 100 / (risk * syminfo.pointvalue))) : na
+                    strategy.entry("EBM S", strategy.short, qty = q, limit = ce)
+                    strategy.exit("EBM S x", "EBM S", stop = sRun, limit = exitMode == "3R target" ? ce - 3 * risk : na)
+                    box.new(time - 2 * 15 * 60000, top, time + 15 * 60000, bot, xloc = xloc.bar_time,
+                         bgcolor = color.new(color.maroon, 80), border_color = color.maroon)
+                    label.new(bar_index, ce, "EBM short @CE", style = label.style_label_left, color = color.maroon, textcolor = color.white, size = size.small)
+                    alert("EBM short armed: limit " + str.tostring(ce, format.mintick) + " stop " + str.tostring(sRun, format.mintick), alert.freq_once_per_bar_close)
+                    sState := 1
+                    sLvl := sRun
+                    sRisk := risk
+                    sRun := na
+                    sBrk := na
+
+// ── Entry deadline 12:00 ─────────────────────────────────────────────────────
+if nextMod >= 720 and nyMod < 720
+    if lState == 1 and strategy.position_size <= 0
+        strategy.cancel("EBM L")
+        lState := 0
+    if sState == 1 and strategy.position_size >= 0
+        strategy.cancel("EBM S")
+        sState := 0
+
+// ── Breakeven at +1R (optional) ──────────────────────────────────────────────
+if exitMode == "Breakeven at +1R" and not beDone
+    if strategy.position_size > 0 and high >= strategy.position_avg_price + lRisk
+        strategy.exit("EBM L x", "EBM L", stop = strategy.position_avg_price)
+        beDone := true
+    if strategy.position_size < 0 and low <= strategy.position_avg_price - sRisk
+        strategy.exit("EBM S x", "EBM S", stop = strategy.position_avg_price)
+        beDone := true
+
+// ── Time exit 15:55 NY ───────────────────────────────────────────────────────
+if nextMod >= 955 and nyMod < 960 and strategy.position_size != 0
+    strategy.close_all(comment = "15:55 exit")
+
+// ── Regime panel ─────────────────────────────────────────────────────────────
+var table panel = table.new(position.top_right, 2, 2, border_width = 1)
+if showTable and barstate.islast
+    table.cell(panel, 0, 0, "ATR14/ATR100", text_color = color.white, bgcolor = color.new(color.gray, 20))
+    table.cell(panel, 1, 0, na(regime) ? "n/a" : str.tostring(regime, "0.00"), text_color = color.white, bgcolor = color.new(color.gray, 20))
+    table.cell(panel, 0, 1, "Gate", text_color = color.white, bgcolor = color.new(color.gray, 20))
+    table.cell(panel, 1, 1, gateOk ? "OPEN" : "CLOSED", text_color = color.white, bgcolor = gateOk ? color.new(color.teal, 10) : color.new(color.maroon, 10))
