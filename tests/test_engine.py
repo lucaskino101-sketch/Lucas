@@ -42,6 +42,7 @@ PARAMS = [Params(), Params(entry_type="ifvg"), Params(entry_type="mss_close", ta
           Params(mode="continuation", tf=1, stop_mode="level", rr=3.0, max_trades=2),
           Params(mode="continuation", tf=1, need_opp_sweep=True, target="eod"),
           Params(mode="ifvg", max_risk_atr=5.0, max_trades=3),
+          Params(mode="ifvg", ifvg_target="eqh_lrlr", max_rr=8.0, max_risk_atr=5.0, max_trades=3),
           Params(mode="ifvg", tf=5, htf=60, ifvg_stop="wick", ifvg_target="rr_be", require_sweep=True, max_risk_atr=5.0),
           Params(mode="ifvg", ifvg_stop="ifvg", ifvg_target="rr", ifvg_series=True, require_htf_fvg=True,
                  sessions=((420, 660),), max_risk_atr=5.0, max_trades=2)]

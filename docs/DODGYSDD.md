@@ -102,3 +102,16 @@ The data ends in May 2020, before Dodgy's model became popular, and is a CFD pro
 for futures. His discretion (skipping setups that "don't look right") can't be
 tested. The canonical rules follow his own descriptions as closely as public
 sources allow, and every interpretation choice is listed above.
+
+### Update: EQH/EQL and LRLR targets
+
+His rating sheet lists equal highs/lows and low-resistance liquidity runs (LRLR) as
+targets, and they're now coded (`ifvg_target="eqh_lrlr"`): untaken swing highs within
+max(2 ticks, 0.03 ATR) of each other count as EQH (EQL for shorts), and three or more
+untaken stepping highs with no opposing FVG between them count as an LRLR. The nearest
+one at least 1R away is the target (cap 8R); session liquidity is only the fallback.
+
+Across 32 runs (1m/5m, A+/all, close/wick stop, killzones, both markets, both periods)
+win rates rose to 26–41% but every run stayed negative: −0.07R to −0.44R per trade,
+within about 0.05R of the old liquidity target. Before costs it's still ≈0 (−0.07R to
++0.04R). Full table: `results/dodgysdd/eqh_lrlr_report.txt`.

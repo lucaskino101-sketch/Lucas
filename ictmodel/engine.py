@@ -525,6 +525,9 @@ def _long_ifvg(mod, o, h, l, c, sweep_lv, target_lv, atr, p: Params, oth_cummin=
         if hh[q] < hl[q - 2]:
             new_zones.setdefault(int(hend[q]), []).append([hh[q], hl[q - 2], False])
     swings, zones = [], []
+    sh_list = []        # [price, taken] swing highs on the structure timeframe (EQH / LRLR liquidity)
+    bfvgs = []          # [bottom, top] bearish structure FVGs not yet closed through (resistance)
+    eq_tol = max(2 * p.tick, 0.03 * atr)
 
     origin = origin_k = None
     frozen, frozen_px = False, None
@@ -572,6 +575,15 @@ def _long_ifvg(mod, o, h, l, c, sweep_lv, target_lv, atr, p: Params, oth_cummin=
             del tgt_untouched[kk]
 
         if k >= 2:
+            # ---- liquidity bookkeeping for EQH / LRLR targets ----
+            for sh in sh_list:
+                if not sh[1] and th[k] > sh[0]:
+                    sh[1] = True
+            if th[k - 1] >= th[k - 2] and th[k - 1] >= th[k]:
+                sh_list.append([th[k - 1], False])
+            bfvgs = [f for f in bfvgs if tc[k] <= f[1]]
+            if th[k] < tl[k - 2]:
+                bfvgs.append([th[k], tl[k - 2]])
             # ---- structure update at the close of structure bar k ----
             if th[k - 1] >= th[k - 2] and th[k - 1] >= th[k]:
                 origin, origin_k = th[k - 1], k - 1
@@ -631,6 +643,26 @@ def _long_ifvg(mod, o, h, l, c, sweep_lv, target_lv, atr, p: Params, oth_cummin=
                             lvls.append(run_high)
                         ok = [v for v in lvls if v >= e + p.min_rr * r]
                         t = min(min(ok), e + p.max_rr * r) if ok else e + p.rr * r
+                    elif p.ifvg_target == "eqh_lrlr":
+                        ups = sorted(v for v, taken in sh_list if not taken and v > e)
+                        cands_t = []
+                        for a, b2 in zip(ups, ups[1:]):          # equal highs: resting stops above
+                            if b2 - a <= eq_tol:
+                                cands_t.append(b2)
+                        run = [ups[0]] if ups else []             # LRLR: stepping highs, no gap in the way
+                        for v in ups[1:]:
+                            if any(run[-1] < f[0] < v for f in bfvgs):
+                                break
+                            run.append(v)
+                        if len(run) >= 3:
+                            cands_t.append(run[-1])
+                        ok = [v for v in cands_t if v >= e + p.min_rr * r]
+                        if ok:
+                            t = min(min(ok), e + p.max_rr * r)
+                        else:
+                            lvls = [cand["origin"]] + [v for kk, v in tgt_untouched.items() if LEVEL_KNOWN_AT.get(kk, 9999) <= m]
+                            ok = [v for v in lvls if v >= e + p.min_rr * r]
+                            t = min(min(ok), e + p.max_rr * r) if ok else e + p.rr * r
                     else:
                         t = e + p.rr * r
                     entry, hard, target, risk, fvg_bot, be_lvl = e, s, t, r, cand["bot"], cand["origin"]
