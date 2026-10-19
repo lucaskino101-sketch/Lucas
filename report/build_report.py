@@ -20,7 +20,24 @@ data = {
             "es": {"d": cd["EBM · S&P 500"]["dates"], "v": cd["EBM · S&P 500"]["cumR"]}},
     "textbook": {"ict": weekly("ICT 2022 model · Nasdaq-100"), "sb": weekly("Silver Bullet · Nasdaq-100")},
     "gate": cd["gate_curve"],
+    "dodgy": json.load(open(os.path.join(ROOT, "results", "figures", "dodgysdd_chart_data.json"))),
 }
+ds = pd.read_csv(os.path.join(ROOT, "results", "dodgysdd", "summary.csv"))
+canon = ds[ds.canonical & (ds.cost == "conservative")]
+
+
+def _row(r):
+    name = {"NAS100_USD": "Nasdaq-100", "SPX500_USD": "S&P 500"}[r.inst]
+    per = "2005–14" if r.period == "IS" else "2015–20 holdout"
+    sign = lambda v, d=2: ("+" if v > 0 else "−" if v < 0 else "") + f"{abs(v):.{d}f}"
+    return (f'<tr{" class=\"hl\"" if r.period == "OOS" else ""}><td>{name}</td><td>{per}</td><td class="num">{int(r.trades):,}</td>'
+            f'<td class="num">{100 * r.win_rate:.0f}</td><td class="num">{sign(r.expectancy_R)}R</td>'
+            f'<td class="num">{sign(r.gross_E, 3)}R</td><td class="num">{sign(r.t_stat, 1)}</td>'
+            f'<td class="num">{r.profit_factor:.2f}</td><td class="num">−{abs(100 * r.max_dd):.1f}%</td></tr>')
+
+
+dodgy_rows = "".join(_row(r) for _, r in canon.sort_values(["inst", "period"]).iterrows())
+DODGY_LEAD = open(os.path.join(HERE, "dodgy_lead.html")).read() if os.path.exists(os.path.join(HERE, "dodgy_lead.html")) else ""
 
 # ---------- setup schematic (illustrative 15m candles) ----------
 def y(p):
@@ -127,5 +144,6 @@ timeline_svg += (f'<svg class="tl-narrow" viewBox="0 0 360 {n_end + 32}" role="i
 html = open(os.path.join(HERE, "template.html")).read()
 html = html.replace("__DATA__", json.dumps(data, separators=(",", ":")))
 html = html.replace("__SETUP_SVG__", setup_svg).replace("__TIMELINE_SVG__", timeline_svg)
+html = html.replace("__DODGY_ROWS__", dodgy_rows).replace("__DODGY_LEAD__", DODGY_LEAD)
 open(os.path.join(HERE, "ebm_report.html"), "w").write(html)
 print("wrote", os.path.join(HERE, "ebm_report.html"), len(html) // 1024, "KB")

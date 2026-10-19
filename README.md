@@ -18,6 +18,10 @@ one new model that came out of the research: the **Expansion Breakaway Model
   profit factor 1.45, −7% max drawdown at 1% risk) but **lost on the S&P 500**
   (−0.35R) and on FX and gold. The t-stat is about 1, and three trend days carry
   the Nasdaq profit.
+- **DodgysDD's iFVG model loses too.** Mechanized from his public material and
+  run with no tuning, it lost −0.23R per trade on the 2015–2020 Nasdaq-100 holdout
+  (3,066 trades) and −0.25R on the S&P 500; 282 of 288 variant runs were negative.
+  See [docs/DODGYSDD.md](docs/DODGYSDD.md).
 - Nobody can honestly promise "the most profitable model ever". What this repo
   gives you is a model you can forward-test and the evidence to judge it with.
 
@@ -50,6 +54,7 @@ TradingView yet, so expect possible small syntax fixes.
 | **EBM** (this repo) | +0.58R × 78 | **+0.31R × 58** | −0.35R × 47 |
 | ICT 2022 model, mechanized | −0.38R × 1,927 | −0.27R × 1,084 | −0.46R × 995 |
 | Silver Bullet, mechanized | −0.35R × 1,019 | −0.17R × 553 | −0.36R × 469 |
+| DodgysDD iFVG, canonical | −0.35R × 3,746 | −0.23R × 3,066 | −0.25R × 2,464 |
 
 How every concept was tested, and what failed: [docs/RESEARCH.md](docs/RESEARCH.md).
 

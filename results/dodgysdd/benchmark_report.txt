@@ -1,0 +1,41 @@
+NAS100_USD IS done
+NAS100_USD OOS done
+SPX500_USD IS done
+SPX500_USD OOS done
+
+### CANONICAL DodgysDD iFVG (1m, A+ sweep, killzones, close-stop, liquidity target)
+      inst         cost period  trades  trades_per_year  win_rate  expectancy_R  gross_E  t_stat  profit_factor  max_dd
+NAS100_USD conservative     IS    3746          376.818     0.237        -0.355   -0.045 -17.163          0.528  -1.000
+NAS100_USD    realistic     IS    3746          376.818     0.237        -0.200   -0.045  -9.706          0.685  -1.000
+NAS100_USD conservative    OOS    3066          571.647     0.222        -0.230   -0.004  -9.754          0.652  -0.999
+NAS100_USD    realistic    OOS    3066          571.647     0.222        -0.117   -0.004  -4.981          0.796  -0.982
+SPX500_USD conservative     IS    3309          332.859     0.247        -0.330   -0.031 -13.802          0.576  -1.000
+SPX500_USD    realistic     IS    3309          332.859     0.247        -0.181   -0.031  -7.575          0.730  -0.998
+SPX500_USD conservative    OOS    2464          459.406     0.267        -0.251    0.021  -8.666          0.666  -0.998
+SPX500_USD    realistic    OOS    2464          459.406     0.267        -0.115    0.021  -3.987          0.824  -0.957
+
+### All 72 variants, conservative costs: distribution of expectancy (R/trade)
+                   count   mean    std    min    25%    50%    75%    max
+inst       period                                                        
+NAS100_USD IS       72.0 -0.294  0.097 -0.539 -0.349 -0.322 -0.206 -0.060
+           OOS      72.0 -0.166  0.114 -0.588 -0.231 -0.158 -0.074  0.083
+SPX500_USD IS       72.0 -0.269  0.132 -0.493 -0.347 -0.305 -0.188  0.058
+           OOS      72.0 -0.233  0.086 -0.447 -0.275 -0.230 -0.179 -0.002
+
+variants with positive expectancy: inst        period
+NAS100_USD  IS        0/72
+            OOS       2/72
+SPX500_USD  IS        4/72
+            OOS       0/72
+
+### Best 5 variants per instrument in 2005-2014 and what they did in 2015-2020
+  NAS100_USD {'tf': 5, 'grade': 'sweep_htf', 'session': 'kz', 'stop': 'close', 'exit': 'liq'} IS E=-0.060 (n=18) -> OOS E=-0.350 (n=10)
+  NAS100_USD {'tf': 5, 'grade': 'sweep_htf', 'session': 'kz', 'stop': 'wick', 'exit': 'liq'} IS E=-0.090 (n=18) -> OOS E=-0.588 (n=10)
+  NAS100_USD {'tf': 5, 'grade': 'sweep', 'session': 'ny', 'stop': 'wick', 'exit': 'rr'} IS E=-0.132 (n=1755) -> OOS E=-0.018 (n=953)
+  NAS100_USD {'tf': 5, 'grade': 'sweep', 'session': 'ny', 'stop': 'close', 'exit': 'rr'} IS E=-0.140 (n=1802) -> OOS E=-0.023 (n=988)
+  NAS100_USD {'tf': 5, 'grade': 'sweep', 'session': 'ny', 'stop': 'wick', 'exit': 'liq'} IS E=-0.142 (n=1793) -> OOS E=+0.007 (n=995)
+  SPX500_USD {'tf': 5, 'grade': 'sweep_htf', 'session': 'kz', 'stop': 'wick', 'exit': 'rr_be'} IS E=+0.058 (n=10) -> OOS E=-0.002 (n=14)
+  SPX500_USD {'tf': 5, 'grade': 'sweep_htf', 'session': 'kz', 'stop': 'wick', 'exit': 'liq'} IS E=+0.031 (n=10) -> OOS E=-0.266 (n=14)
+  SPX500_USD {'tf': 5, 'grade': 'sweep_htf', 'session': 'kz', 'stop': 'wick', 'exit': 'rr'} IS E=+0.025 (n=10) -> OOS E=-0.294 (n=14)
+  SPX500_USD {'tf': 5, 'grade': 'sweep_htf', 'session': 'kz', 'stop': 'close', 'exit': 'rr'} IS E=+0.008 (n=10) -> OOS E=-0.355 (n=14)
+  SPX500_USD {'tf': 5, 'grade': 'sweep_htf', 'session': 'kz', 'stop': 'close', 'exit': 'liq'} IS E=-0.014 (n=10) -> OOS E=-0.447 (n=14)

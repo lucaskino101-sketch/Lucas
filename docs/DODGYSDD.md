@@ -52,3 +52,53 @@ aren't published, and the rebuild's author says Dodgy uses the most sensitive
 setting, so no gap-size filter is applied. Volume delta and SMT are Deluxe extras he
 trades without. Premium/discount has no published definition. Discretion ("I
 wouldn't have taken that one") can't be coded.
+
+## Results
+
+All runs use 2005–2014 and the 2015–2020 holdout, Oanda 1-minute mid prices, and the
+same conservative fills as the rest of the repo. Nothing was tuned: the canonical
+version was fixed in `ictmodel/model.py` before the first run, and all 72 variants
+are in `results/dodgysdd/summary.csv`.
+
+### Canonical (1m, A+ sweep, killzones, close-back stop, liquidity target)
+
+| Market | Period | Trades | Win % | Expectancy, 1-pt / 0.5-pt costs | Before costs | t | Profit factor |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Nasdaq-100 | 2005–2014 | 3,746 | 24 | −0.35R / −0.20R | −0.045R | −17.2 | 0.53 |
+| Nasdaq-100 | 2015–2020 | 3,066 | 22 | −0.23R / −0.12R | −0.004R | −9.8 | 0.65 |
+| S&P 500 | 2005–2014 | 3,309 | 25 | −0.33R / −0.18R | −0.031R | −13.8 | 0.58 |
+| S&P 500 | 2015–2020 | 2,464 | 27 | −0.25R / −0.12R | +0.021R | −8.7 | 0.67 |
+
+(S&P costs are 0.5 / 0.25 points.) That's about two trades a day, mostly between
+09:00 and 11:00 and in London. Long and short behave the same.
+
+### All 72 variants
+
+Positive variants: Nasdaq-100 0 of 72 (2005–14) and 2 of 72 (2015–20);
+S&P 500 4 of 72 (2005–14) and 0 of 72 (2015–20). Five of those six are 5-minute
+"A+ with HTF FVG" killzone variants with only 10 trades each; the sixth made +0.007R.
+None is positive in the other period.
+
+![All variants](../results/figures/dodgysdd_variants.png)
+
+### Why it loses
+
+- **No edge before costs.** Gross expectancy is between −0.045R and +0.02R in every
+  canonical run, a coin flip with a 2:1-ish payoff and a ~25% hit rate.
+- **Costs dominate.** Median 1-minute stops are 1.7–4.8 points, so a round trip costs
+  0.2–0.3R before the trade starts. 5-minute setups lose less for that reason, but still lose.
+- **The A+ filter helps a little.** Requiring a higher-timeframe sweep lifts
+  expectancy by 0.05–0.13R versus taking every iFVG, but doesn't make it positive.
+  Adding HTF FVG overlap cuts trades by 92–96% without a consistent improvement.
+
+This matches what the open-source rebuild's author reported from watching the
+indicator in real time: with losing setups shown instead of hidden, iFVGs work about
+as often as chance. It also matches this repo's broader finding that 1-minute ICT
+entry patterns have no edge after costs.
+
+### Limits
+
+The data ends in May 2020, before Dodgy's model became popular, and is a CFD proxy
+for futures. His discretion (skipping setups that "don't look right") can't be
+tested. The canonical rules follow his own descriptions as closely as public
+sources allow, and every interpretation choice is listed above.

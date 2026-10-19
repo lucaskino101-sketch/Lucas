@@ -21,6 +21,8 @@
   --s2: #eb6834;
   --s3: #1baf7a;
   --s4: #eda100;
+  --s5: #e87ba4;
+  --s6: #008300;
   --good: #0ca30c;
   --critical: #d03b3b;
   --code-bg: #e8eaee;
@@ -32,14 +34,14 @@
     --bg: #0e0f11; --panel: #1a1a19; --fg: #eef0f2; --fg2: #c3c7ce; --muted: #8d929b; --rule: #2c2d30;
     --axis: #404247; --mark-neutral: #5a5f68; --accent: #3987e5; --accent-wash: rgba(57, 135, 229, 0.18);
     --band: rgba(57, 135, 229, 0.09); --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
-    --code-bg: #24262a; color-scheme: dark;
+    --s5: #d55181; --s6: #008300; --code-bg: #24262a; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0e0f11; --panel: #1a1a19; --fg: #eef0f2; --fg2: #c3c7ce; --muted: #8d929b; --rule: #2c2d30;
   --axis: #404247; --mark-neutral: #5a5f68; --accent: #3987e5; --accent-wash: rgba(57, 135, 229, 0.18);
   --band: rgba(57, 135, 229, 0.09); --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
-  --code-bg: #24262a; color-scheme: dark;
+  --s5: #d55181; --s6: #008300; --code-bg: #24262a; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
@@ -168,7 +170,7 @@ footer p { max-width: 80ch; }
   <section aria-labelledby="h-stand">
     <div class="verdict">
       <h3 id="h-stand">Where it stands</h3>
-      <p>The model made money on the Nasdaq-100 holdout and lost it on the S&amp;P 500, EUR/USD, GBP/USD and gold. The Nasdaq profit rests on about three trend days and the t-stat is about 1. Treat it as a lead to forward-test, not a proven edge. The mechanized textbook ICT setups lost money everywhere.</p>
+      <p>The model made money on the Nasdaq-100 holdout and lost it on the S&amp;P 500, EUR/USD, GBP/USD and gold. The Nasdaq profit rests on about three trend days and the t-stat is about 1. Treat it as a lead to forward-test, not a proven edge. The mechanized textbook ICT setups lost money everywhere, and so did DodgysDD's iFVG model (−0.23R per trade on the Nasdaq-100 holdout).</p>
     </div>
     <div class="tiles">
       <div class="tile">
@@ -289,6 +291,35 @@ footer p { max-width: 80ch; }
         </tbody>
       </table>
     </div>
+  </section>
+
+  <section aria-labelledby="h-dodgy">
+    <h2 id="h-dodgy">DodgysDD's iFVG model, benchmarked</h2>
+    __DODGY_LEAD__
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Market</th><th>Period</th><th class="num">Trades</th><th class="num">Win %</th><th class="num">Expectancy</th><th class="num">Before costs</th><th class="num">t</th><th class="num">Profit factor</th><th class="num">Max DD at 1%</th></tr></thead>
+        <tbody>__DODGY_ROWS__</tbody>
+      </table>
+    </div>
+    <figure class="panel" id="c-dodgy">
+      <div class="chart-head">
+        <h3>Canonical iFVG model, cumulative R, conservative costs</h3>
+        <div class="legend"><span><i style="background: var(--s5)"></i>Nasdaq-100</span><span><i style="background: var(--s6)"></i>S&amp;P 500</span></div>
+      </div>
+      <div class="plotwrap"><div class="plot" tabindex="0" aria-label="Cumulative R of the canonical DodgysDD iFVG model. Use the arrow keys to move through time."></div><div class="tip" hidden></div></div>
+      <figcaption>1-minute chart, A+ grade (a 15-minute swing swept during the leg), London and New York killzones, entry on the inverting close, exit on a close back through the gap or at the nearest liquidity. Costs are 1.0 point (NQ) and 0.5 point (ES) per round trip.</figcaption>
+      <details><summary>Table view</summary><div class="tablewrap"><table id="t-dodgy"></table></div></details>
+    </figure>
+    <figure class="panel" id="c-variants">
+      <div class="chart-head">
+        <h3>All 72 variants, expectancy per trade</h3>
+        <div class="legend"><span><i class="sq" style="background: var(--s5)"></i>Canonical</span><span><i class="sq" style="background: var(--mark-neutral)"></i>Other variants</span></div>
+      </div>
+      <div class="plotwrap"><div class="plot"></div><div class="tip" hidden></div></div>
+      <figcaption>Each dot is one combination of chart timeframe (1m or 5m), grade filter, session, stop and exit, at conservative costs. Hover or tab to a dot for its settings.</figcaption>
+      <details><summary>Table view</summary><div class="tablewrap"><table id="t-variants"></table></div></details>
+    </figure>
   </section>
 
   <section aria-labelledby="h-caveats">
@@ -549,7 +580,73 @@ footer p { max-width: 80ch; }
     document.getElementById("t-gate").innerHTML = html + "</tbody>";
   }
 
+
+  function dotPlot() {
+    const host = document.getElementById("c-variants");
+    const plot = host.querySelector(".plot");
+    const tip = host.querySelector(".tip");
+    const groups = [["NAS100_USD", "IS", "Nasdaq-100", "2005–2014"], ["NAS100_USD", "OOS", "Nasdaq-100", "2015–2020"],
+                    ["SPX500_USD", "IS", "S&P 500", "2005–2014"], ["SPX500_USD", "OOS", "S&P 500", "2015–2020"]];
+    const V = DATA.dodgy.variants;
+    function draw(W) {
+      W = Math.max(300, W);
+      const H = 300, m = { l: 60, r: 12, t: 16, b: 44 };
+      let lo = 0, hi = 0;
+      V.forEach((v) => { lo = Math.min(lo, v.E); hi = Math.max(hi, v.E); });
+      const nt = niceTicks(lo, hi, 5);
+      const y0 = nt.ticks[0], y1 = nt.ticks[nt.ticks.length - 1];
+      const Y = (v) => m.t + (y1 - v) / (y1 - y0) * (H - m.t - m.b);
+      const band = (W - m.l - m.r) / groups.length;
+      plot.textContent = "";
+      tip.hidden = true;
+      const svg = mk("svg", { width: W, height: H, viewBox: "0 0 " + W + " " + H, role: "img",
+        "aria-label": "Expectancy of all 72 DodgysDD iFVG variants for each market and period." }, plot);
+      nt.ticks.forEach((v) => {
+        mk("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), class: v === 0 ? "zero" : "grid" }, svg);
+        txt(svg, m.l - 8, Y(v) + 4, v === 0 ? "0" : fmtR(v, 1), "tick", "end");
+      });
+      groups.forEach((g, gi) => {
+        const cx = m.l + band * (gi + 0.5);
+        txt(svg, cx, H - m.b + 18, g[2], "tick", "middle");
+        txt(svg, cx, H - m.b + 32, g[3], "sublabel", "middle");
+        const pts = V.filter((v) => v.inst === g[0] && v.period === g[1]);
+        pts.sort((a, b) => (a.canon ? 1 : 0) - (b.canon ? 1 : 0));
+        pts.forEach((v, j) => {
+          const x = v.canon ? cx : cx + (((j * 0.618034) % 1) - 0.5) * band * 0.5;
+          const dot = mk("circle", { cx: x, cy: Y(v.E), r: v.canon ? 6 : 4, class: "enddot",
+            style: "fill: var(" + (v.canon ? "--s5" : "--mark-neutral") + ")" }, svg);
+          const hit = mk("circle", { cx: x, cy: Y(v.E), r: 9, fill: "transparent", tabindex: "0", class: "bar",
+            "aria-label": g[2] + " " + g[3] + ", " + v.label + ": " + fmtR(v.E, 2) + " over " + v.n + " trades" }, svg);
+          const show = () => {
+            tip.innerHTML = '<div class="tipdate">' + g[2] + " · " + g[3] + (v.canon ? " · canonical" : "") + "</div><div>" + v.label +
+              '</div><div class="tiprow"><span class="key" style="background: var(' + (v.canon ? "--s5" : "--mark-neutral") +
+              ')"></span><span>' + v.n + " trades</span><b>" + fmtR(v.E, 2) + "</b></div>";
+            tip.hidden = false;
+            const tw = tip.offsetWidth;
+            let left = x + 12;
+            if (left + tw > W - 4) left = x - tw - 12;
+            tip.style.left = Math.max(4, left) + "px";
+            tip.style.top = Math.max(4, Y(v.E) - 20) + "px";
+          };
+          hit.addEventListener("pointerenter", show);
+          hit.addEventListener("focus", show);
+          hit.addEventListener("pointerleave", () => { tip.hidden = true; });
+          hit.addEventListener("blur", () => { tip.hidden = true; });
+          void dot;
+        });
+      });
+    }
+    observe(plot, draw);
+    let html = '<thead><tr><th>Market</th><th>Period</th><th>Variant</th><th class="num">Trades</th><th class="num">Expectancy</th></tr></thead><tbody>';
+    groups.forEach((g) => V.filter((v) => v.inst === g[0] && v.period === g[1]).sort((a, b) => b.E - a.E).forEach((v) => {
+      html += "<tr" + (v.canon ? ' class="hl"' : "") + "><td>" + g[2] + "</td><td>" + g[3] + "</td><td>" + v.label + (v.canon ? " (canonical)" : "") +
+        '</td><td class="num">' + v.n + '</td><td class="num">' + fmtR(v.E, 2) + "</td></tr>";
+    }));
+    document.getElementById("t-variants").innerHTML = html + "</tbody>";
+  }
+
   document.getElementById("c-ebm").dataset.table = "t-ebm";
+  document.getElementById("c-dodgy").dataset.table = "t-dodgy";
   document.getElementById("c-text").dataset.table = "t-text";
   lineChart("c-ebm", [
     { name: "Nasdaq-100", short: "Nasdaq-100", color: "--s1", d: DATA.ebm.nq.d, v: DATA.ebm.nq.v },
@@ -560,5 +657,10 @@ footer p { max-width: 80ch; }
     { name: "Silver Bullet", short: "Silver Bullet", color: "--s4", d: DATA.textbook.sb.d, v: DATA.textbook.sb.v }
   ], "Cumulative R of mechanized textbook ICT setups on the Nasdaq-100, 2005 to May 2020. The 2022 model falls to about minus 1,030R and the Silver Bullet to about minus 450R.");
   gateChart();
+  lineChart("c-dodgy", [
+    { name: "Nasdaq-100", short: "Nasdaq-100", color: "--s5", d: DATA.dodgy.canonical.nq.d, v: DATA.dodgy.canonical.nq.v },
+    { name: "S&P 500", short: "S&P 500", color: "--s6", d: DATA.dodgy.canonical.es.d, v: DATA.dodgy.canonical.es.v }
+  ], "Cumulative R of the canonical DodgysDD iFVG model, 2005 to May 2020, on the Nasdaq-100 and S&P 500.");
+  dotPlot();
 })();
 </script>

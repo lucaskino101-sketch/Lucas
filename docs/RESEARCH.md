@@ -64,6 +64,7 @@ can differ.
 | London-open "Judas swing" | `15_london_drift.py` | Negative; the London-open drift exists (+1.8–2.3 bps, t 3.8–4.8) but is smaller than costs | Real drift, not tradeable at these costs |
 | Opening range gap, CE as a magnet | `07_structural_effects.py` | CE touch rates by 11:30 (63–95% for gaps up to 0.5 ATR) are close to random-walk odds | No edge |
 | Benchmarks: noise-area momentum, 30-min opening-range breakout | `05_momentum_benchmarks.py` | Sharpe −1.1 / −1.3; −0.09R / −0.21R | Not ICT, also negative |
+| DodgysDD's inversion FVG (sweep → gap → close back through it), 72 variants, both periods | `20_dodgysdd_benchmark.py` | Canonical −0.23 to −0.35R; ≈0 before costs; 282 of 288 runs negative | No edge ([details](DODGYSDD.md)) |
 | **Breakaway continuation × volatility-expansion gate (ATR14/ATR100)** | `11_regime_gate.py`, `16_final_selection.py` | Expectancy rises steadily with the gate; at ≥1.1 it's positive on both indices, in both halves, for all three exit styles | **The one candidate** |
 
 ![Textbook ICT setups](../results/figures/textbook_ict_cumR.png)
