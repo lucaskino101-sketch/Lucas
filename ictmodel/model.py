@@ -66,3 +66,33 @@ def reference_models(inst: str = "NAS100_USD", cost: str = "conservative") -> di
         # The EBM pattern with the regime gate switched off
         "Breakaway continuation, no regime gate": ebm(inst, cost).replace(regime_min=0.0),
     }
+
+
+# ---------------------------------------------------------------------------
+# DodgysDD iFVG model, mechanized from public sources (docs/DODGYSDD.md).
+# Pre-registered before any result was seen; every variant below is reported.
+# ---------------------------------------------------------------------------
+DODGY_SESSIONS = {
+    "ny": ((570, 930),),                 # 09:30-15:30, the indicator's default alert session
+    "kz": ((120, 300), (510, 660)),      # killzones: London 02:00-05:00, New York 08:30-11:00
+}
+DODGY_HTF = {1: 15, 5: 60}               # chart -> higher timeframe, as in the indicator's auto mapping
+
+
+def dodgy(inst: str = "NAS100_USD", cost: str = "conservative", tf: int = 1, grade: str = "sweep",
+          session: str = "kz", stop: str = "close", exit: str = "liq") -> Params:
+    """DodgysDD-style iFVG. Canonical (as he describes it): 1m, A+ sweep filter, killzones,
+    enter on the inverting close, stop on a close back through the gap, target liquidity.
+
+    grade: 'all' (every iFVG), 'sweep' (HTF swing swept during the leg), 'sweep_htf' (+ HTF FVG overlap)
+    stop:  'close' | 'wick' | 'ifvg'          exit: 'liq' | 'rr' (2R) | 'rr_be' (2R, stop to entry at origin)
+    """
+    return Params(
+        mode="ifvg", ctx_start=0, tf=tf, htf=DODGY_HTF[tf], grace=15,
+        sessions=DODGY_SESSIONS[session], exit_mod=955,
+        require_sweep=grade in ("sweep", "sweep_htf"), require_htf_fvg=grade == "sweep_htf",
+        ifvg_stop=stop, ifvg_target=exit, rr=2.0, min_rr=1.0, max_rr=5.0,
+        target_levels=BUY_SIDE, sweep_levels=SELL_SIDE,
+        min_risk_atr=0.0, min_risk_pts=RISK_FLOOR[inst], max_risk_atr=5.0, max_trades=3,
+        cost_pts=COSTS[inst][cost], tick=0.25,
+    )

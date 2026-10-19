@@ -79,6 +79,15 @@ class Params:
     mode: str = "reversal"        # reversal (sweep -> shift) | continuation (run -> breakaway FVG)
     stop_mode: str = "fvg"        # continuation stop: below FVG candle 1 ("fvg") or the run level
     need_opp_sweep: bool = False  # continuation only after the opposite side's liquidity was raided first
+    # ifvg mode (DodgysDD-style inversion FVG, see docs/DODGYSDD.md)
+    htf: int = 15                 # higher timeframe for swing sweeps and HTF FVGs (minutes)
+    grace: int = 15               # the FVG must invert within this many structure bars
+    ifvg_stop: str = "close"      # wick | ifvg | close (close back through the FVG; wick = hard stop)
+    ifvg_target: str = "liq"      # rr | liq | rr_be (rr with stop to entry at the origin swing)
+    ifvg_series: bool = False     # merge adjacent FVGs ("Series" detection)
+    require_sweep: bool = False   # A+: a higher-timeframe swing swept during the leg
+    require_htf_fvg: bool = False # iFVG overlaps a live higher-timeframe FVG
+    sessions: tuple = ((570, 930),)  # confirmation windows (minute of day, NY)
     # filters
     regime_min: float = 0.0       # trade only if ATR14/ATR100 >= this (volatility expansion gate)
     regime_max: float = float("inf")
@@ -484,6 +493,169 @@ def _long_continuation(mod, o, h, l, c, sweep_lv, target_lv, atr, p: Params,
     return trades
 
 
+def _long_ifvg(mod, o, h, l, c, sweep_lv, target_lv, atr, p: Params, oth_cummin=None, oth_lv=None):
+    """DodgysDD-style inversion-FVG model (long space), see docs/DODGYSDD.md.
+
+    A 3-bar swing high starts a down leg. The lowest single bearish FVG of the leg
+    is the candidate; a structure-bar close above its top within ``grace`` bars
+    inverts it and enters at that close. The A+ filter needs a higher-timeframe
+    swing low swept during the leg. Stop: the leg's wick low since the FVG
+    ("wick"), the FVG bottom ("ifvg"), or a close back below the FVG with the wick
+    low as hard stop ("close"). The origin swing high is the break-even level.
+    """
+    n1 = len(mod)
+    trades = []
+    if n1 < 30:
+        return trades
+    tfb = (mod - p.ctx_start) // p.tf
+    ids, to, th, tl, tc, tend = resample_ohlc(o, h, l, c, tfb)
+    nt = len(ids)
+    close_at = np.full(n1, -1, np.int64)
+    close_at[tend] = np.arange(nt)
+    k_start = ids * p.tf + p.ctx_start                     # structure-bar start minute
+    # higher-timeframe swing lows (fractal on completed HTF bars) and HTF FVG zones
+    hid, _, hh, hl, _, hend = resample_ohlc(o, h, l, c, (mod - p.ctx_start) // p.htf)
+    new_swings, new_zones = {}, {}
+    for q in range(1, len(hid) - 1):
+        if hl[q] <= hl[q - 1] and hl[q] <= hl[q + 1]:
+            new_swings.setdefault(int(hend[q + 1]), []).append(hl[q])
+    for q in range(2, len(hid)):
+        if hl[q] > hh[q - 2]:
+            new_zones.setdefault(int(hend[q]), []).append([hh[q - 2], hl[q], True])
+        if hh[q] < hl[q - 2]:
+            new_zones.setdefault(int(hend[q]), []).append([hh[q], hl[q - 2], False])
+    swings, zones = [], []
+
+    origin = origin_k = None
+    frozen, frozen_px = False, None
+    live = None
+    swept_flag = False
+    cands = []
+    run_high = -np.inf
+    tgt_untouched = dict(target_lv)
+    in_trade = False
+    entry = stop = hard = target = risk = fvg_bot = be_lvl = 0.0
+    be_armed = False
+    meta = {}
+
+    def in_session(minute):
+        return any(a <= minute < b for a, b in p.sessions)
+
+    for i in range(n1):
+        m = mod[i]
+        hi, lo, op = h[i], l[i], o[i]
+        k = close_at[i]
+
+        if in_trade:
+            ex_px = reason = None
+            if m >= p.exit_mod:
+                ex_px, reason = op, "time"
+            elif lo <= hard:
+                ex_px, reason = min(hard, op), ("be" if be_armed else "stop")
+            elif hi >= target:
+                ex_px, reason = target, "target"
+            elif p.ifvg_stop == "close" and k >= 0 and tc[k] < fvg_bot:
+                ex_px, reason = tc[k], "close-stop"
+            if ex_px is not None:
+                pnl = ex_px - entry
+                meta.update(exit_i=i, exit_mod=int(m), exit=ex_px, reason=reason,
+                            r_gross=pnl / risk, r_net=(pnl - p.cost_pts) / risk)
+                trades.append(meta)
+                meta, in_trade = {}, False
+                if len(trades) >= p.max_trades:
+                    break
+            elif p.ifvg_target == "rr_be" and not be_armed and hi >= be_lvl:
+                hard, be_armed = max(hard, entry), True
+
+        run_high = max(run_high, hi)
+        for kk in [kk for kk, v in tgt_untouched.items() if hi >= v]:
+            del tgt_untouched[kk]
+
+        if k >= 2:
+            # ---- structure update at the close of structure bar k ----
+            if th[k - 1] >= th[k - 2] and th[k - 1] >= th[k]:
+                origin, origin_k = th[k - 1], k - 1
+                frozen, frozen_px, live, swept_flag = False, None, None, False
+            if origin_k is not None:
+                if frozen and tl[k - 1] < frozen_px:
+                    frozen = False
+                if (not frozen) and th[k] < tl[k - 2] and (k - 2) >= origin_k - 1:
+                    top, bot = tl[k - 2], th[k]
+                    if live is not None and live not in cands:
+                        live = None
+                    if live is None:
+                        live = {"k1": k, "top": top, "bot": bot, "origin": origin, "origin_k": origin_k, "swept": swept_flag}
+                        cands.append(live)
+                    elif p.ifvg_series and live["k1"] == k - 1:
+                        live["top"], live["bot"], live["k1"] = max(live["top"], top), min(live["bot"], bot), k
+                    elif bot < live["bot"]:
+                        cands.remove(live)
+                        live = {"k1": k, "top": top, "bot": bot, "origin": origin, "origin_k": origin_k, "swept": swept_flag}
+                        cands.append(live)
+            hit = [s for s in swings if tl[k] < s]
+            if hit:
+                swings = [s for s in swings if s not in hit]
+                if origin_k is not None:
+                    swept_flag = True
+            if live is not None:
+                live["swept"] = live["swept"] or swept_flag
+            if origin_k is not None and not frozen and tl[k - 1] <= tl[k - 2] and tl[k - 1] <= tl[k]:
+                frozen, frozen_px = True, tl[k - 1]
+            for z in zones:
+                if z[2] and z[1] is not None and tl[k] < z[0]:
+                    z[2] = None                              # bullish zone traded through: mitigated
+                elif (not z[2]) and z[2] is not None and th[k] > z[1]:
+                    z[2] = None
+            # ---- inversions ----
+            for cand in list(cands):
+                if tc[k] > cand["top"] and k > cand["k1"]:
+                    cands.remove(cand)
+                    e = tc[k]
+                    if in_trade or len(trades) >= p.max_trades or e >= cand["origin"]:
+                        continue
+                    if not in_session(int(k_start[k])) or m >= p.exit_mod:
+                        continue
+                    if p.require_sweep and not cand["swept"]:
+                        continue
+                    if p.require_htf_fvg and not any(
+                            z[2] is not None and not (cand["bot"] > z[1] or cand["top"] < z[0]) for z in zones[-3:]):
+                        continue
+                    wick = float(tl[cand["k1"]:k + 1].min())
+                    s = {"wick": wick, "close": wick, "ifvg": cand["bot"]}[p.ifvg_stop]
+                    r = e - s
+                    if r <= 0 or r < max(p.min_risk_atr * atr, p.min_risk_pts) or r > p.max_risk_atr * atr:
+                        continue
+                    if p.ifvg_target == "liq":
+                        lvls = [cand["origin"]] + [v for kk, v in tgt_untouched.items() if LEVEL_KNOWN_AT.get(kk, 9999) <= m]
+                        if run_high > e:
+                            lvls.append(run_high)
+                        ok = [v for v in lvls if v >= e + p.min_rr * r]
+                        t = min(min(ok), e + p.max_rr * r) if ok else e + p.rr * r
+                    else:
+                        t = e + p.rr * r
+                    entry, hard, target, risk, fvg_bot, be_lvl = e, s, t, r, cand["bot"], cand["origin"]
+                    be_armed, in_trade = False, True
+                    meta = dict(sweep_mod=int(mod[i]), ext=wick, swept="htf-sweep" if cand["swept"] else "",
+                                stack=int(cand["swept"]), mss_mod=int(k_start[k]), arm_mod=int(m), limit=e,
+                                stop=s, target=t, risk=r, smt=False, fill_i=i, entry_mod=int(m), entry=e)
+                elif k - cand["k1"] > p.grace:
+                    cands.remove(cand)
+                    if cand is live:
+                        live = None
+        # HTF structure that completes on this bar becomes usable from the next bar
+        if i in new_swings:
+            swings.extend(new_swings[i])
+        if i in new_zones:
+            zones.extend(new_zones[i])
+
+    if in_trade and meta:
+        pnl = c[n1 - 1] - entry
+        meta.update(exit_i=n1 - 1, exit_mod=int(mod[n1 - 1]), exit=c[n1 - 1], reason="eod",
+                    r_gross=pnl / risk, r_net=(pnl - p.cost_pts) / risk)
+        trades.append(meta)
+    return trades
+
+
 def run_day(day: Day, p: Params, other: Day | None = None) -> list[dict]:
     out = []
     if p.regime_min > 0 or np.isfinite(p.regime_max):
@@ -491,7 +663,7 @@ def run_day(day: Day, p: Params, other: Day | None = None) -> list[dict]:
             return out
     lv = day.levels
     oth_lv = other.levels if other is not None else None
-    gen = _long_continuation if p.mode == "continuation" else _long_candidates
+    gen = {"continuation": _long_continuation, "ifvg": _long_ifvg}.get(p.mode, _long_candidates)
     if p.sides in ("both", "long"):
         oc = _aligned_cum_extreme(day, other, p.sweep_start, negate=False) if p.smt else None
         for t in gen(day.mod, day.o, day.h, day.l, day.c,
